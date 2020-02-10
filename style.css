@@ -1,0 +1,16 @@
+body{
+     font-family: 'Alegreya', serif;
+}
+
+.void-main{
+   
+    /padding: .0em;
+    border: .2em solid #00f0f0;
+    animation-name: oof;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    margin: 2em;
+    max-width: 20em;
+    animation-direction: alternate;
+    margin: 4em auto;
+}
