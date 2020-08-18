@@ -2,7 +2,7 @@ let v1, v2;
 let buff;
 let c;
 let xoff = 0;
-let p5button;
+let p5button, behancebutton;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -17,15 +17,20 @@ function setup() {
   createP("And this is the story of how I -")
     .position(v2.x - 250, v2.y - 10)
     .style("color:white;text-align:right;");
-  p5button = createButton("sketches")
+  p5button = createButton("p5*")
     .position(v1.x, v2.y)
     .mousePressed(p5buttonpress);
+  behancebutton = createButton("bē")
+    .position(v1.x + 40, v2.y)
+    .mousePressed(behancebuttonpress);
 }
 
 function p5buttonpress() {
   window.open("https://editor.p5js.org/uhzeel/sketches");
 }
-
+function behancebuttonpress() {
+  window.open("https://behance.net/jazeelwithazee");
+}
 function draw() {
   xoff += 0.1;
   let noiz = 50 * noise(xoff);
