@@ -13,7 +13,7 @@ function setup() {
 }
 
 function p5ji(){
-  window.open("https://editor.p5js.org/uhzeel/sketches");
+  window.open("https://editor.p5js.org/uhzeel/sketches","_blank");
 }
 
 function draw() {
