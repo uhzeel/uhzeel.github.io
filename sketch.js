@@ -2,7 +2,7 @@ let v1, v2;
 let buff;
 let c;
 let xoff = 0;
-let p5button, behancebutton;
+let p5button, behancebutton, arenabutton;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -23,6 +23,9 @@ function setup() {
   behancebutton = createButton("bē")
     .position(v1.x + 40, v2.y)
     .mousePressed(behancebuttonpress);
+  arenabutton = createButton("<b>**</b>")
+    .position(v1.x + 75, v2.y)
+    .mousePressed(arenabuttonpress);
 }
 
 function p5buttonpress() {
@@ -30,6 +33,9 @@ function p5buttonpress() {
 }
 function behancebuttonpress() {
   window.open("https://behance.net/jazeelwithazee");
+}
+function arenabuttonpress() {
+  window.open("https://www.are.na/jazeel");
 }
 function draw() {
   xoff += 0.1;
