@@ -3,13 +3,12 @@ canvas {
 }
 
 html, body {
-  margin: 0;
-  /padding: 0;
+  
   position: absolute;
   top: 50%;
   left: 50%;
-  /height: 100%;
-  font-family: "Source Sans Pro", "Helvetica", "Arial", "sans-serif";
+  
+  font-family: monospace;
   background: rgb(20,20,20);
   transform: translate(-50%,-50%);
 }
@@ -20,5 +19,3 @@ html, body {
   justify-content: center;
   flex-direction: row;
 }
-
-
