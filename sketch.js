@@ -9,6 +9,11 @@ function setup() {
   v1 = createVector(buff, buff);
   v2 = createVector(width - buff, height - buff);
   c = createVector(width / 2, height / 2);
+  createButton('p5js sketches').position(width-100,100).mousePressed(p5ji);
+}
+
+function p5ji(){
+  window.open("https://editor.p5js.org/uhzeel/sketches");
 }
 
 function draw() {
