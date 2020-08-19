@@ -4,6 +4,12 @@ let c;
 let xoff = 0;
 let p5button, behancebutton, arenabutton;
 
+let p5sketches;
+
+function preload() {
+  p5sketches = loadStrings('p5sketches.txt');
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   buff = windowWidth * 0.1;
@@ -29,7 +35,7 @@ function setup() {
 }
 
 function p5buttonpress() {
-  window.open("https://editor.p5js.org/uhzeel/sketches");
+  window.open("https://editor.p5js.org/embed/"+random(p5sketches));
 }
 function behancebuttonpress() {
   window.open("https://behance.net/jazeelwithazee");
