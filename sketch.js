@@ -16,7 +16,7 @@ function setup() {
   v1 = createVector(buff, buff);
   v2 = createVector(width - buff, height - buff);
   c = createVector(width / 2, height / 2);
-  createP("Hi, I'm Jazeel.")
+  createP("Hi, I'm uhhhhJazeel.")
     .position(v1.x + 10, v1.y - 10)
     .style("color:white");
   textAlign(RIGHT);
