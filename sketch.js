@@ -35,7 +35,7 @@ function setup() {
 }
 
 function p5buttonpress() {
-  window.open("https://editor.p5js.org/embed/"+random(p5sketches));
+  window.open("https://editor.p5js.org/uhzeel/sketches");//https://editor.p5js.org/embed/"+random(p5sketches));
 }
 function behancebuttonpress() {
   window.open("https://behance.net/jazeelwithazee");
