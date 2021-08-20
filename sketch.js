@@ -4,18 +4,21 @@ let c;
 let xoff = 0;
 let p5button, behancebutton, arenabutton;
 
-let p5sketches;
+let p5sketches, elizax;
 
 function preload() {
   p5sketches = loadStrings('p5sketches.txt');
+  elizax = loadImage('elizax.png');
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   buff = windowWidth * 0.1;
+
   v1 = createVector(buff, buff);
   v2 = createVector(width - buff, height - buff);
   c = createVector(width / 2, height / 2);
+  createImg('elizax.png').position(windowWidth-v1.x-983*0.7, v1.y+50).size(983*0.7,395*0.7).mouseClicked(elizaxf);
   createP("Hi, I'm Jazeel.")
     .position(v1.x + 10, v1.y - 10)
     .style("color:white");
@@ -43,6 +46,9 @@ function behancebuttonpress() {
 function arenabuttonpress() {
   window.open("https://www.are.na/jazeel");
 }
+function elizaxf() {
+  window.open("report0707.pdf");
+}
 function draw() {
   xoff += 0.1;
   let noiz = 50 * noise(xoff);
@@ -50,6 +56,10 @@ function draw() {
   background(20);
   noFill();
   stroke(100);
+  let what = -noiz*0.1;//random(-3,3);
+
+  rect(windowWidth-v1.x-983*0.7+what, v1.y+50+what, 983*0.7+what,395*0.7+what);
+
   c = createVector(mouseX, mouseY);
   vbezier(v1, c, c, v2);
   stroke(255);
