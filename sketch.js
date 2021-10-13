@@ -18,7 +18,14 @@ function setup() {
   v1 = createVector(buff, buff);
   v2 = createVector(width - buff, height - buff);
   c = createVector(width / 2, height / 2);
-  createImg('elizax.png').position(windowWidth-v1.x-983*0.7, v1.y+50).size(983*0.7,395*0.7).mouseClicked(elizaxf);
+  createImg('elizax.png')
+    .position(windowWidth-v1.x-983*0.7, v1.y+50)
+    .size(983*0.7,395*0.7)
+    .mouseClicked(elizaxf);
+  createImg('trapped.gif')
+    .position(v1.x,v1.y)
+    //537x446
+    .size(537*0.5,446*0.5);
   createP("Hi, I'm Jazeel.")
     .position(v1.x + 10, v1.y - 10)
     .style("color:white");
