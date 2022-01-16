@@ -1,0 +1,21 @@
+--only changed initial
+
+ELIZA: Do you think there's something wrong with me?
+YOU:   Yes you're quite horrible
+ELIZA: Does it please you to believe I am quite horrible ?
+YOU:   Quite.
+ELIZA: What does that suggest to you ?
+YOU:   That you are a grave mistake
+ELIZA: Do you sometimes wish you were a grave mistake ?
+YOU:   I AM a grave mistake.
+ELIZA: Do you know anyone else who is a grave mistake ?
+YOU:   YOU!
+ELIZA: What are your feelings now ?
+YOU:   i feel empty
+ELIZA: Of what does feeling empty remind you ?
+YOU:   that i just went through a meltdown with a fucking chatbot
+ELIZA: That's quite interesting.
+YOU:   Yeah i guess you could say that
+ELIZA: You seem to need to guess me.
+
+-- 
