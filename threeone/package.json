@@ -1,7 +1,7 @@
 {
-  "name": "threejs-website",
+  "name": "threeone",
   "version": "1.0.0",
-  "description": "A simple Three.js website project hosted on GitHub Pages.",
+  "description": "pillo on the web",
   "main": "src/main.js",
   "scripts": {
     "start": "live-server src",
