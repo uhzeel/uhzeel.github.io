@@ -1,21 +1,24 @@
-canvas {
-  display: block;
+
+html, body{
+  background-color: black;
+  color: rgba(255,255,255,0.4);
+  font-family: monospace;
 }
 
-html, body {
-  
+.blah{
+  font-size: 1.5rem;
+  position: absolute;
+  top: 4rem;
+  left: 4rem;
+  z-index: 2;
+}
+
+canvas {
+  display: block;
   position: absolute;
   top: 50%;
   left: 50%;
-  overflow:hidden;
+  overflow: hidden;
   font-family: monospace;
-  background: rgb(20,20,20);
   transform: translate(-50%,-50%);
-}
-.flexcontainer {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-}
+  }

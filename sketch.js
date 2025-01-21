@@ -1,84 +1,39 @@
-let v1, v2;
-let buff;
-let c;
-let xoff = 0;
-let p5button, behancebutton, arenabutton;
-
-let p5sketches, elizax;
-
-function preload() {
-  p5sketches = loadStrings('p5sketches.txt');
-  elizax = loadImage('elizax.png');
-}
-
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  buff = windowWidth * 0.1;
-
-  v1 = createVector(buff, buff);
-  v2 = createVector(width - buff, height - buff);
-  c = createVector(width / 2, height / 2);
-  createImg('elizax.png')
-    .position(windowWidth-v1.x-983*0.7, v1.y+50)
-    .size(983*0.7,395*0.7)
-    .mouseClicked(elizaxf);
-  createImg('trapped.gif')
-    .position(v1.x,v1.y)
-    //537x446
-    .size(537*0.5,446*0.5);
-  createP("Hi, I'm Jazeel.")
-    .position(v1.x + 10, v1.y - 10)
-    .style("color:white");
-  textAlign(RIGHT);
-  createP("And this is the story of how I -")
-    .position(v2.x - 250, v2.y - 10)
-    .style("color:white;text-align:right;");
-  p5button = createButton("p5*")
-    .position(v1.x, v2.y)
-    .mousePressed(p5buttonpress);
-  behancebutton = createButton("bē")
-    .position(v1.x + 40, v2.y)
-    .mousePressed(behancebuttonpress);
-  arenabutton = createButton("<b>**</b>")
-    .position(v1.x + 75, v2.y)
-    .mousePressed(arenabuttonpress);
+  createCanvas(600, 600, WEBGL);
 }
 
-function p5buttonpress() {
-  window.open("https://editor.p5js.org/uhzeel/sketches");//https://editor.p5js.org/embed/"+random(p5sketches));
-}
-function behancebuttonpress() {
-  window.open("https://behance.net/jazeelwithazee");
-}
-function arenabuttonpress() {
-  window.open("https://www.are.na/jazeel");
-}
-function elizaxf() {
-  window.open("report0707.pdf");
-}
+let reso = 5;
+let zoff = 0;
+let pZ;
+
 function draw() {
-  xoff += 0.1;
-  let noiz = 50 * noise(xoff);
-
-  background(20);
+  translate(-width/2,-height/2);
+  zoff += 0.005;
+  let xoff = 0;
+  background(0);
+  strokeWeight(2);
+  for (let i = reso; i < width; i += reso) {
+    let yoff = 0;
+    xoff += 0.01;
+    for (let j = reso; j < height; j += reso) {
+      yoff += 0.01;
+      stroke(
+        noise(xoff,yoff,zoff) * 150,
+        map(dist(width/2,height/2,i,j),
+         width/2,0,300,10));
+      pZ=map(noise(xoff,yoff,zoff),0,1,-450,0);
+      point(i,j,pZ);
+    }
+  }
+  push();
+  translate(width/2,height/2,-80);
+  rotateZ(frameCount*noise(zoff)/100);
+  rotateX(frameCount*noise(zoff)/100);
+  rotateY(frameCount*noise(zoff)/100);
   noFill();
-  stroke(100);
-  let what = -noiz*0.1;//random(-3,3);
+  strokeWeight(1);
+  stroke(40);
+  sphere(60,16,16);
+  pop();
 
-  rect(windowWidth-v1.x-983*0.7+what, v1.y+50+what, 983*0.7+what,395*0.7+what);
-
-  c = createVector(mouseX, mouseY);
-  vbezier(v1, c, c, v2);
-  stroke(255);
-  c = createVector(mouseX + noiz, mouseY + noiz);
-  vbezier(v1, c, c, v2);
-}
-function mousePressed() {}
-
-function vbezier(a, ac, bc, b) {
-  bezier(a.x, a.y, ac.x, ac.y, bc.x, bc.y, b.x, b.y);
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
 }
