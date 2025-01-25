@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>EL</title>
+    <script src="elizabot.js" type="text/javascript"></script>
+    <script src="elizadataxy.js" type="text/javascript"></script>
+    <script src="chat.js" type="text/javascript"></script> 
+</head>
+
+<body onload="window.setTimeout(elizaReset, 100)">
+    <div class="crt">
+        <center>
+            <table class="interface" cellspacing="0" cellpadding="5">
+                <form name="e_form" onsubmit="elizaStep(); return false;">
+                    <tr>
+                        <td colspan="2">
+                            <textarea class="history texties" name="e_display" cols="60" rows="10" disabled></textarea>
+                        </td>
+                    </tr>
+                    <tr valign="middle">
+                        <td>
+                            <input class="texties" type="text" name="e_input">
+                        </td>
+                        <td align="right">
+                            <input class="button texties" type="submit" value="say">
+                            <!-- <input type="reset" value="start over" onclick="window.setTimeout(elizaReset, 100)"> -->
+                        </td>
+                    </tr>
+            </form>
+        </table>
+    </center>
+  </div>
+</body>
+
+</html>

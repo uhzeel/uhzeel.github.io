@@ -1,0 +1,59 @@
+* {
+    font-family: monospace;
+}
+
+html,
+body {
+    background-color: #101010;
+    color: rgba(255, 255, 255);
+    font-family: monospace;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.interface {
+    font-size: 1.875rem;
+    line-height: 1.5;
+    z-index: 2;
+    overflow: hidden;
+    background-color: #1f1f1f;
+    padding: 0.5rem;
+    max-width: 800px;
+    word-wrap: break-word;
+}
+
+.texties {
+    background-color: black;
+    color: #ddd;
+    line-height: 1.5;
+    border: 1px solid #888;
+    padding: 1rem;
+    resize: none;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.history {
+    height: 600px;
+}
+
+.button{
+    cursor: pointer;
+    transition: background-color 0.1s, color 0.1s;
+}
+
+.button:hover{
+    background-color: #00ffff;
+    color: #1F1F1F;
+}
+
+.button:active{
+    background-color: #00cccc;
+    color: #1F1F1F;
+}

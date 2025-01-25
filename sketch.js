@@ -19,8 +19,7 @@ function draw() {
     xoff += 0.01;
     for (let j = reso; j < height; j += reso) {
       yoff += 0.01;
-      stroke(
-        noise(xoff,yoff,zoff) * 150)
+      stroke(noise(xoff,yoff,zoff) * 150);
         //map(dist(width/2,height/2,i,j),width/2,0,300,10));
       pZ=map(noise(xoff,yoff,zoff),0,1,-450,0);
       point(i,j,pZ);
