@@ -2,14 +2,17 @@
 // entries prestructured as layed out in Weizenbaum's description
 // [cf: Communications of the ACM, Vol. 9, #1 (January 1966): p 36-45.]
 
+
 var elizaInitials = [
   "what seems to be the problem now?"
   //,add more here
 ];
 
+
 var elizaFinals = [
   "Psshhh."
 ];
+
 
 var elizaQuits = [
   "bye",
@@ -20,40 +23,6 @@ var elizaQuits = [
   "quit"
 ];
 
-// var elizaPres = [
-//   "dont", "don't",
-//   "cant", "can't",
-//   "wont", "won't",
-//   "recollect", "remember",
-//   "recall", "remember",
-//   "dreamt", "dreamed",
-//   "dreams", "dream",
-//   "maybe", "perhaps",
-//   "certainly", "yes",
-//   "machine", "computer",
-//   "machines", "computer",
-//   "computers", "computer",
-//   "were", "was",
-//   "you're", "you are",
-//   "i'm", "i am",
-//   "same", "alike",
-//   "identical", "alike",
-//   "equivalent", "alike",
-//   ":)", "overjoyed",
-//   "ypu", "you",
-//   "how", "what",
-//   "when", "what",
-//   "whats", "what is",
-//   "whens", "when is",
-//   "hows", "how is",
-//   "what's", "what is",
-//   "who's", "who is",
-//   "youre", "you are",
-//   "im", "i am",
-//   "idk", "i don't know",
-//   "apologize", "apologise",
-//   "wanna", "want to"
-// ];
 
 var elizaPres = [
   "dont", "don't",
@@ -89,6 +58,7 @@ var elizaPres = [
   "wanna", "want to"
 ];
 
+
 var elizaPosts = [
   "am", "are",
   "your", "my",
@@ -105,6 +75,7 @@ var elizaPosts = [
   "any", "a",
   "anything", "a few things"
 ];
+
 
 var elizaSynons = {
   "be": ["am", "is", "are", "was"],
@@ -143,7 +114,7 @@ var elizaKeywords = [
   ["xnone", 0, [
     ["*", [
       "Warm fingers you got there. Or is the keyboard heating up?",
-      "\"I... think I need a hug.\", says the script. Do I?",
+      "`I... think I need a hug.`, says the script. Do I?",
       "*deletes your response* I can't seem to trust you. I'm working on it.",
       "Jazeel is attempting to induce a chance semantic coherence now.",
       "*awkward silence*",
@@ -470,11 +441,11 @@ var elizaKeywords = [
       "Are you uncomfortable?"
     ]]
   ]],
-  [":)", 0, [
-    ["*", [
-      "goto overjoyed"
-    ]]
-  ]],
+  // [":)", 0, [
+  //   ["*", [
+  //     "goto overjoyed"
+  //   ]]
+  // ]],
   ["yes", 0, [
     ["* yes * see that *", [
       "Sapien. I sorta was hoping you would. I think we've made progress here.",
@@ -608,7 +579,7 @@ var elizaKeywords = [
     ]],
     ["* why can't i *", [
       "Do you really want that kind of a program written into you?",
-      "Try... Can-ing. \"I can... something... (2)\"~",
+      "Try... Can-ing. `I can... something... (2)`~",
       "Because the answer simply isn't anything but 42.",
       "goto what"
     ]],
@@ -702,7 +673,7 @@ var elizaKeywords = [
       "I'm sure the scrawlings would help."
     ]],
     ["*", [
-      "Maybe it's just me. Maybe I only \"know\" because I've been scripted to sound like I do?",
+      "Maybe it's just me. Maybe I only `know` because I've been scripted to sound like I do?",
       "Who? Can you be more specific?",
       "Tis' the Age of Forgetting. *poof* My advice? Just follow the yellow brick road."
     ]]
@@ -978,25 +949,24 @@ var elizaKeywords = [
   ]],
   ["sigh", 64, [
     ["*", [
-      "Yeah it's a randomizer. \"sigh = sigher[sighindex];\"",
-      "String[] sigher = {\"\", \"*sigh* \", \"\", \"\", \"\", \"*groan* \", \"*suppresses giggle* \", \"*glassy eyed* \", \"\", \"\", \"\", \"\", \"\", \"Um. \", \"Hmmm. \", \"\", \"\", \"Ayy. \", \"\", \"Ah. \", \"\", \"\", \"\", \"Aaaah... \", \"\", \"\", \"\", \"\", \"...\", \"\", \"But... \"};",
+      "Yeah it's a randomizer. `sigh = sigher[sighindex];`",
+      // "String[] sigher = {``, `*sigh*`, \"\", \"\", \"\", \"*groan* \", \"*suppresses giggle* \", \"*glassy eyed* \", \"\", \"\", \"\", \"\", \"\", \"Um. \", \"Hmmm. \", \"\", \"\", \"Ayy. \", \"\", \"Ah. \", \"\", \"\", \"\", \"Aaaah... \", \"\", \"\", \"\", \"\", \"...\", \"\", \"But... \"};",
       "goto fightj"
     ]]
-  ]],
-  ["bug", 4, [
-    ["*", [
-      "goto bugstory"
-    ]]
-  ]],
-  ["bugs", 4, [
-    ["*", [
-      "goto bugstory"
-    ]]
   ]]
+  // ["bug", 4, [
+  //   ["*", [
+  //     "goto bugstory"
+  //   ]]
+  // ]],
+  // ["bugs", 4, [
+  //   ["*", [
+  //     "goto bugstory"
+  //   ]]
+  // ]]
 ];
 
-// regexp/replacement pairs to be performed as final cleanings
-// here: cleanings for multiple bots talking to each other
+
 var elizaPostTransforms = [
   / old old/g, " old",
   /\bthey were( not)? me\b/g, "it was$1 me",
@@ -1006,7 +976,6 @@ var elizaPostTransforms = [
   /\bI to have (\w+)/, "I have $1",
   /Earlier you said your( own)? (\w+)( now)?\./, "Earlier you talked about your $2."
 ];
-
 
 
 // eof

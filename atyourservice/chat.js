@@ -6,7 +6,7 @@ const displayRows = 20;
 
 // Define a variable string
 const honorificE = ">>"; //▓░z█a · ";
-const honorificU = "";//me  · ";
+const honorificU = ""; //me  · ";
 
 function elizaReset() {
     eliza.reset();
@@ -45,11 +45,13 @@ function elizaStep() {
         form.e_display.value = elizaLines.join('\n');
         scrollToBottom();
     } else if (elizaLines.length === 0) {
+
         // No input and no saved lines -> output initial
         const initial = `${honorificE} ${eliza.getInitial()}`;
         elizaLines.push(initial);
         form.e_display.value = `${initial}\n`;
         scrollToBottom();
+        
     }
 
     form.e_input.value = '';

@@ -51,7 +51,7 @@ function ElizaBot(noRandomFlag) {
 	this.capitalizeFirstLetter=true;
 	this.debug=false;
 	this.memSize=20;
-	this.version="1.1 modified by jazeel";
+	this.version="1.1 (original)";
 	if (!this._dataParsed) this._init();
 	this.reset();
 }
