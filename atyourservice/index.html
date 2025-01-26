@@ -14,16 +14,16 @@
 <body onload="window.setTimeout(elizaReset, 100)">
     <div class="crt">
         <center>
-            <table class="interface" cellspacing="0" cellpadding="5">
+            <table class="interface" cellspacing="0" cellpadding="0">
                 <form name="e_form" onsubmit="elizaStep(); return false;">
                     <tr>
                         <td colspan="2">
-                            <textarea class="history texties" name="e_display" cols="60" rows="10" disabled></textarea>
+                            <textarea class="history texties" name="e_display" cols="60" rows="20" disabled></textarea>
                         </td>
                     </tr>
                     <tr valign="middle">
                         <td>
-                            <input class="texties" type="text" name="e_input">
+                            <input class="typehere texties" type="text" name="e_input" autocomplete="off">
                         </td>
                         <td align="right">
                             <input class="button texties" type="submit" value="say">

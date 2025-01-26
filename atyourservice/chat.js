@@ -21,7 +21,7 @@ function elizaStep() {
 
     if (eliza.quit) {
         form.e_input.value = '';
-        if (confirm("This session is over.\nStart over?")) elizaReset();
+        if (confirm("We'll need to terminate this session.\n\nYou obviously said something unnecessary.\n\n\n\nShould we forget everything and start over?")) elizaReset();
         form.e_input.focus();
         return;
     }

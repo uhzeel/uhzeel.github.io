@@ -41,6 +41,7 @@ body {
 
 .history {
     height: 600px;
+    border: none;
 }
 
 .button{
@@ -49,11 +50,11 @@ body {
 }
 
 .button:hover{
-    background-color: #00ffff;
+    background-color: #fff;
     color: #1F1F1F;
 }
 
 .button:active{
-    background-color: #00cccc;
+    background-color: #fff;
     color: #1F1F1F;
 }

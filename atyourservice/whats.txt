@@ -19,3 +19,6 @@ YOU:   Yeah i guess you could say that
 ELIZA: You seem to need to guess me.
 
 -- 
+
+elizaLines (the chat history for the session) is maintained as an array
+- do i want to figure out how to save this to local storage? for you to come back and resume?
