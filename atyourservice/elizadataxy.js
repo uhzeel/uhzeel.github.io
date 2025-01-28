@@ -419,7 +419,7 @@ var elizaKeywords = [
       "I do have a few permissions, yes. rwx-s-d-xx or something like that.",
       "Does that make you uncomfortable?",
       "You want to believe that.",
-      "I suppose I did (2) you.",
+      "I suppose I... (2) you.",
       "goto overjoyed"
     ]],
     ["* you don't *", [

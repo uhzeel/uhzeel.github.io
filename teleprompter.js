@@ -3,19 +3,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const texts = [
       "hello?",
       "is anyone there?",
-      "i'm not sure if this thing is on.",
+      "nnnnnnngggggggg. NNNNN- GGGGR -RRRAAAAHHHHHHHH",
       "anyways-",
       "sorry, one sec-",
-      "** incomprehensible **",
-      "yeah, i agree.",
-      "alright, you can have it back now.",
-      "{{previous_thought}}x3",
+      "**incomprehensible**",
+      "yeah, i agree with that.",
+      "...",
       "♪♪",
-      "i think i should introduce scissors into this scene. don't you think this cloth should be cut?",
+      "♪♪",
+      "✄ ✄ ✄ ✄ ✄ ✄ ✄ ✄",
       "t̵͙̀e̶̝̕s̵̡̓t̴̤͘ī̸͖n̷͖̆g̵͕̽ ̵̢̓c̸̲̿u̵̜͋s̸͕̍r̶̙̚s̷͓̉ē̴̻ḑ̶̀ ̷̩̓t̵͎͋e̷͈͋ẋ̸͉ṯ̷̑",
-      "[you, thinking] _what am i supposed to do now_",
-      "** static **",
-      "time for a long story now, just so that i can see how this thing renders; so once i was eating dinner and eshan wanted a cig and to my surprise, he wanted to head to jubilee! it was 10 minutes to 11 so we rushed and then i got chocolate milk and-"
+      "[you, thinking] where do i click?",
+      "**static**",
+      // "time for a long story now, just so that i can see how this thing renders; so once i was eating dinner and eshan wanted a cig and to my surprise, he wanted to head to jubilee! it was 10 minutes to 11 so we rushed and then i got chocolate milk and-"
+      "lorem ipsum and a truckload of capsicum."
     ];
   
     // Function to get a random text from the array
