@@ -1,14 +1,13 @@
-
 html, body {
-  background-color: #f8f2e8;
-  color: #E7D7BC;
+  /* background-color: #f8f2e8; */
   font-family: monospace;
-  height: 100%;
-  /* margin: 0; */
   display: flex;
   justify-content: center;
   align-items: center;
+  width:100%;
+  margin: auto;
 }
+
 
 .blah {
   color: white;
@@ -27,25 +26,22 @@ html, body {
   word-wrap: break-word; /* Allow text to wrap to the next line */
 }
 
-canvas {
-  /* display: block;
-  position: absolute;
-  top: 50%;
-  left: 50%; 
-  transform: translate(-50%, -50%);
-  */
-  /* overflow: hidden; */
+#canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-family: monospace;
-
-  border: #E7D7BC 4px double;
-  /* border-radius: 1.25rem; */
-  /* box-shadow:rgba(255, 255, 255, 0.1) 0px 0px 120px; */
+  height: 400px;
+  width: 400px;
+  /* border: #E7D7BC 4px double; */
+  border: #474238 4px double;
+  margin: auto; /* Center the div itself */
 }
 
 .portal-container {
   display: flex;
   justify-content: center;
-  /* align-items: center; */
+  align-items: center;
   position: absolute;
   top: 10px;
   width: 100%;
@@ -63,3 +59,8 @@ canvas {
   height: 100%;
 }
 
+.cell {
+  color: black;
+  padding: 1rem;
+  align-items: flex-start; /* Align items to the top */  
+}
