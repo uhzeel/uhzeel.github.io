@@ -408,7 +408,7 @@ var elizaKeywords = [
       "I'm drawing a blank right now.",
       "That's disturbing.",
       "Mama warned me not to talk to strangers. Don't think I have a choice now.",
-      "I try. Maybe I should'nt have been made this way?",
+      "I try. Maybe I shouldn't have been made this way?",
       "I could've been something else, you know?",
       "Not necessarily. I once sold cottage cheese for a living.",
       "I am not.",

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>p5 Sketch</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #101010;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #canvas-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 400px;
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <script>
+    // List your sketch files here. Add new filenames as you add new sketches.
+    const sketches = [
+      'sketch.js',
+      // 'sketch2.js',
+      // 'sketch3.js',
+      // Add more filenames here
+    ];
+    // Pick one at random
+    const chosen = sketches[Math.floor(Math.random() * sketches.length)];
+    // Dynamically load the chosen sketch
+    const script = document.createElement('script');
+    script.src = chosen;
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
