@@ -1,3 +1,0 @@
-[CSS]
-https://generative-art-with-css.commons.host/
-https://yuanchuan.dev/multiple-drop-shadows
