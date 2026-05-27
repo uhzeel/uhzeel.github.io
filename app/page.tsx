@@ -1,6 +1,10 @@
+import P5BackgroundLoader from './components/P5BackgroundLoader';
+
 export default function Home() {
   return (
-    <main className="max-w-prose mx-auto px-6 py-16">
+    <>
+      <P5BackgroundLoader />
+      <main className="relative z-10 max-w-prose mx-auto px-6 py-16">
 
       <p className="font-medium mt-4 mb-8">Jazeel wuz here</p>
 
@@ -50,5 +54,6 @@ export default function Home() {
       </p>
 
     </main>
+    </>
   );
 }
