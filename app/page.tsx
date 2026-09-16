@@ -47,7 +47,7 @@ export default function Home() {
         {' · '}
         <a href="mailto:jazeel.ameen@gmail.com" className="hover:text-[#111]">email</a>
         {' · '}
-        <a href="/assets/jazeel12pm.pdf" target="_blank" rel="noopener" className="hover:text-[#111]">cv</a>
+        <a href="/assets/Jazeel - September 2026.pdf" target="_blank" rel="noopener" className="hover:text-[#111]">cv</a>
       </p>
 
       <p className="text-xs text-[#bbb] mt-8 pt-8 border-t border-[#f0f0f0] flex gap-1.5">
