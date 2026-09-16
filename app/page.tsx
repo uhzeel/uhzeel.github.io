@@ -25,8 +25,10 @@ export default function Home() {
           exciting, exhausting, and wildly rewarding.
         </p>
         <p>
-          If looking for an updated portfolio, just give up — I've been neck deep in building
-          for the last 4 years. This site is a work in progress. Maybe some day.
+          I don't really have a shareable static portfolio — 
+          been neck deep in building for the last 4 years. 
+          This site acts as a placeholder tombstone, and a way to reach me. 
+          If you want to see more of my work, or just chat about building products, feel free to reach out.
         </p>
       </div>
 
