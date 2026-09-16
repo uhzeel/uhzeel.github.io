@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Jazeel Ameen',
+  title: 'uhweb',
   description: 'Creative technologist based in India.',
 };
 

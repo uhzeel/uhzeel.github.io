@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getCollection, type BlogFrontmatter } from '@/lib/content';
 
-export const metadata = { title: 'Writing — Jazeel' };
+export const metadata = { title: 'Writing — uhweb' };
 
 export default async function BlogPage() {
   const posts = (await getCollection<BlogFrontmatter>('blog')).sort(

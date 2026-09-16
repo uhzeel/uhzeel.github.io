@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getCollection, type ProjectFrontmatter } from '@/lib/content';
 
-export const metadata = { title: 'Work — Jazeel' };
+export const metadata = { title: 'Work — uhweb' };
 
 export default async function ProjectsPage() {
   const projects = (await getCollection<ProjectFrontmatter>('projects')).sort(
