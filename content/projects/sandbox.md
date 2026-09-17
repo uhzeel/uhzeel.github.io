@@ -49,6 +49,35 @@ Interactive pieces can be dropped straight into the page as an iframe, sized to 
   <figcaption>Full-bleed: edge to edge, no gutter. Worth using sparingly — probably a hero, not a body image.</figcaption>
 </figure>
 
+## Framed mockups
+
+A `:::frame` block sets a tinted band behind whatever it holds, which is what UI mockups want: a screenshot whose controls deliberately overshoot its own edge needs a surface to overshoot onto. The band runs edge to edge, the contents stay on the normal tracks, and the colour is any Tailwind palette token.
+
+:::frame stone-100
+![Placeholder](/assets/sandbox/placeholder-wide.svg "One mockup in a stone-100 band.")
+:::
+
+Anything in the frame that isn't an image becomes supporting text, and it hangs in the gutter beside the mockup rather than under it, top-aligned with the image. A short `figcaption` can still sit directly under the image at the same time — a label and a note about the thing labelled are different jobs.
+
+:::frame stone-100
+![Placeholder](/assets/sandbox/placeholder-wide.svg "A caption, still under the image.")
+
+Supporting text in the rail. It takes full markdown, so it can carry **emphasis**, a [link](/projects/) or a short list — room enough to explain what's happening in the mockup without pushing the mockup itself down the page.
+
+{{point 22 30}} A note that starts with a point marker drops a numbered pin on the mockup and keeps the same number in front of itself.
+
+{{point 74 62}} Pins number themselves in the order they're written, so adding one in the middle renumbers the rest.
+:::
+
+Frames hold whatever markdown you put in them, so a row of images works the same way inside one as it does outside.
+
+:::frame yellow-50
+![Placeholder](/assets/sandbox/placeholder-wide.svg)
+![Placeholder](/assets/sandbox/placeholder-wide.svg)
+:::
+
+Every image on the page opens in a modal when clicked, including the thumbnail in the annotation rail above — there's nothing to add in the markdown for it.
+
 ---
 
 A closing paragraph, back in the content column, to confirm the flow resumes cleanly after a full-bleed element and a horizontal rule.

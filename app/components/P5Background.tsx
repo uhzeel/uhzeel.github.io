@@ -22,6 +22,15 @@ export default function P5Background() {
     import('p5').then((mod) => {
       const p5 = mod.default;
 
+      // p5's "sketch verifier" assumes the last <script> on the page is the
+      // user's sketch, then fetches and parses it as an ES module to warn about
+      // shadowed globals. Here the last script is whatever was appended last — a
+      // Turbopack chunk, or Instagram's embed.js, which is a sloppy-mode script
+      // using `with`, so parsing it throws a console SyntaxError. The flag is
+      // read off the p5 class, not the instance, so it has to be set here.
+      // (Cast because @types/p5 is still on 1.x and doesn't know the flag.)
+      (p5 as unknown as { disableSketchChecker: boolean }).disableSketchChecker = true;
+
       instance = new p5((p: InstanceType<typeof import('p5')['default']>) => {
         p.setup = () => {
           const cnv = p.createCanvas(p.windowWidth, p.windowHeight);

@@ -14,22 +14,22 @@ export default async function BlogPage() {
       <SiteHeader />
 
       {posts.length === 0 ? (
-        <p className="text-[#888]">Nothing here yet.</p>
+        <p className="text-neutral-500">Nothing here yet.</p>
       ) : (
         <ul>
           {posts.map((post) => (
             <li key={post.slug}>
               <Link
                 href={`/blog/${post.slug}`}
-                className="flex justify-between items-start gap-8 py-4 border-b border-[#f0f0f0] text-[#111] no-underline group"
+                className="flex justify-between items-start gap-8 py-4 border-b border-neutral-100 text-neutral-900 no-underline group"
               >
                 <div>
-                  <p className="group-hover:text-[#555] transition-colors mb-1">{post.data.title}</p>
+                  <p className="group-hover:text-neutral-600 transition-colors mb-1">{post.data.title}</p>
                   {post.data.description && (
-                    <p className="text-sm text-[#888]">{post.data.description}</p>
+                    <p className="text-sm text-neutral-500">{post.data.description}</p>
                   )}
                 </div>
-                <span className="text-xs text-[#bbb] shrink-0 pt-0.5">
+                <span className="text-xs text-neutral-400 shrink-0 pt-0.5">
                   {new Date(post.data.date).toLocaleDateString('en-GB', { year: 'numeric', month: 'short' })}
                 </span>
               </Link>

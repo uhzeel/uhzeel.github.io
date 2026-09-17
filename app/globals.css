@@ -4,8 +4,8 @@
 
 @layer base {
   html {
-    background: #fff;
-    color: #101010;
+    background: theme('colors.neutral.50');
+    color: theme('colors.neutral.900');
     font-size: 14px;
   }
 
@@ -16,7 +16,7 @@
 
   hr {
     border: none;
-    border-top: 1px solid #e8e8e8;
+    border-top: 1px solid theme('colors.neutral.200');
   }
 }
 
@@ -25,12 +25,15 @@
 .article-grid {
   --gutter: 1.5rem;
   --measure: calc(620px - var(--gutter) * 2);
+  /* How far past the measure a bleed element reaches, on each side. Frames
+     raise it so mockups get more room than a body image needs. */
+  --wide: 8rem;
   display: grid;
   grid-template-columns:
     [full-start] minmax(var(--gutter), 1fr)
-    [wide-start] minmax(0, 8rem)
+    [wide-start] minmax(0, var(--wide))
     [content-start] min(var(--measure), 100% - var(--gutter) * 2) [content-end]
-    minmax(0, 8rem) [wide-end]
+    minmax(0, var(--wide)) [wide-end]
     minmax(var(--gutter), 1fr) [full-end];
 }
 
@@ -44,7 +47,7 @@
    grid row can only align to whole blocks. The highlight is unscoped because the
    home page hand-writes a mark/annotation pair outside any .prose container. */
 mark {
-  background: #fbf1a9;
+  background: theme('colors.yellow.100');
   color: inherit;
   padding: 0 0.12em;
   border-radius: 2px;
@@ -62,16 +65,18 @@ mark {
   right: calc(-10rem - 1.5rem);
   width: 10rem;
   padding-top: 0.5em;
-  border-top: 1px solid #e8e8e8;
-  font-size: 0.85em;
+  border-top: 1px solid theme('colors.neutral.200');
+  /* rem, not em: 14px flat, matching the body rather than scaling off whatever
+     element the highlight happened to land in. */
+  font-size: 1rem;
   line-height: 1.6;
-  color: #777;
+  color: theme('colors.neutral.500');
   text-align: left;
 }
 .annotation p { margin-bottom: 0.6em; line-height: 1.6; }
 .annotation p:last-child { margin-bottom: 0; }
 .annotation img { margin-bottom: 0.5em; }
-mark:hover + .annotation { color: #111; border-color: #999; }
+mark:hover + .annotation { color: theme('colors.neutral.900'); border-color: theme('colors.neutral.400'); }
 
 /* No rail left to put them in — fold notes back into the column. */
 @media (max-width: 960px) {
@@ -82,15 +87,159 @@ mark:hover + .annotation { color: #111; border-color: #999; }
     margin: 1.2em 0;
     padding: 0.75em 0 0.75em 1rem;
     border-top: none;
-    border-left: 2px solid #e8e8e8;
+    border-left: 2px solid theme('colors.neutral.200');
   }
 }
+
+/* A tinted band for mockups, written as `:::frame stone-100` … `:::`. It runs
+   edge to edge so UI that deliberately overshoots the edge of a mock has
+   somewhere to overshoot into; the nested .article-grid on the same element
+   keeps the mockup itself on the page's normal tracks. Colour arrives as an
+   inline --frame-bg resolved from the Tailwind palette in lib/content.ts. */
+.frame {
+  /* Mockups earn more width than body images: 572px of measure plus 2 × 16rem
+     puts them at about 1020px, against 796px elsewhere. This is the knob —
+     raising it widens every mockup and pushes out the breakpoint below, since
+     the rail lives in whatever is left over. */
+  --wide: 16rem;
+  background: var(--frame-bg);
+  padding: 3rem 0;
+  margin: 2.5rem 0;
+}
+.frame > :first-child { margin-top: 0; }
+.frame > :last-child { margin-bottom: 0; }
+
+/* Supporting text hangs in the gutter beside the mockup rather than under it,
+   pinned to the image's own row and centred against it. It only appears once
+   the gutter is genuinely wide enough to set text in — below that the mockup
+   keeps the whole band and the text falls underneath. A figcaption is
+   unaffected: a short label still belongs directly under the image. */
+.frame-aside {
+  grid-column: wide-end / full-end;
+  grid-row: 1;
+  align-self: center;
+  min-width: 0;
+  max-width: 16rem;
+  padding-left: 1.5rem;
+  padding-right: var(--gutter);
+  /* 14px flat, same as .annotation and the body — rail text is set smaller than
+     body copy nowhere on the site. */
+  font-size: 1rem;
+  line-height: 1.6;
+  color: theme('colors.neutral.500');
+}
+.frame-aside > :first-child { margin-top: 0; }
+.frame-aside > :last-child { margin-bottom: 0; }
+.frame-aside p { margin-bottom: 0.9em; line-height: 1.6; }
+.frame-aside h2, .frame-aside h3 { font-size: 1em; margin-bottom: 0.4em; }
+
+/* Numbered callouts. A pin on the mockup and the same number in front of the
+   note that explains it — no line between them, which is what lets the pairing
+   survive the rail folding under the image on a narrow screen.
+
+   Pink because a pin has to win against arbitrary UI underneath it, and nothing
+   in the site's neutral-and-yellow palette does — greyscale chrome swallows a
+   neutral pin, and yellow is too close to the mark highlight to read as a
+   different kind of mark. The dark ring does the separating the fill can't.
+
+   Everything that makes a pin a pin lives on .pin, in rem rather than em, so
+   the one on the mockup and the one in front of the note are the same object at
+   the same size — .pin-on-image only says where it sits. */
+.pin-target { position: relative; display: block; }
+.pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 999px;
+  background: theme('colors.rose.600');
+  color: theme('colors.neutral.50');
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+  vertical-align: middle;
+}
+.pin-on-image {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  /* Decorative — clicks belong to the image underneath, which opens the modal. */
+  pointer-events: none;
+}
+/* Clears the ring, which sits outside the box and would otherwise touch the text. */
+.frame-aside .pin { margin-right: 0.55em; }
+
+/* A 1020px mockup plus two rails wide enough to set text in needs roughly this
+   much viewport; under that the mockup keeps the whole band. */
+@media (max-width: 1400px) {
+  .frame-aside {
+    grid-column: content;
+    grid-row: auto;
+    max-width: none;
+    padding: 0;
+    margin-top: 1.75rem;
+  }
+}
+
+/* Click-to-zoom. The cursor is the only affordance on the image itself, so it
+   has to carry the hint; the button role and tab stop are added by ImageZoom
+   at runtime, which keeps the page inert when JS hasn't loaded. */
+.prose img { cursor: zoom-in; }
+
+dialog.zoom {
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; }
+.zoom-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  padding: 3rem 1.5rem;
+}
+.zoom-inner img {
+  max-width: 100%;
+  max-height: calc(100vh - 10rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: zoom-out;
+}
+.zoom-caption {
+  max-width: 620px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  text-align: center;
+  color: theme('colors.neutral.400');
+}
+.zoom-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: theme('colors.neutral.400');
+  cursor: pointer;
+}
+.zoom-close:hover { color: theme('colors.neutral.50'); }
 
 .embed-frame {
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border: 1px solid #e8e8e8;
-  background: #111;
+  border: 1px solid theme('colors.neutral.200');
+  background: theme('colors.neutral.900');
   margin: 2.5rem 0;
 }
 .embed-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
@@ -98,9 +247,12 @@ mark:hover + .annotation { color: #111; border-color: #999; }
 .prose p { margin-bottom: 1.4em; line-height: 1.8; }
 .prose p:last-child { margin-bottom: 0; }
 /* Grid items don't collapse margins, so these top margins are only the *extra*
-   space beyond the 1.4em the previous element already contributes. */
-.prose h2 { font-size: 1rem; font-weight: 600; margin-top: 0.6rem; margin-bottom: 0.5rem; }
-.prose h3 { font-size: 0.95rem; font-weight: 600; margin-top: 0.1rem; margin-bottom: 0.4rem; }
+   space beyond the 1.4em the previous element already contributes. The bottom
+   margins have nothing to add to, so they carry the whole gap themselves —
+   roughly half the space above, which binds the heading to the text it
+   introduces without gluing the two together. */
+.prose h2 { font-size: 1rem; font-weight: 600; margin-top: 0.6rem; margin-bottom: 0.9rem; }
+.prose h3 { font-size: 0.95rem; font-weight: 600; margin-top: 0.1rem; margin-bottom: 0.75rem; }
 .prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1.4em; }
 .prose ul { list-style: disc; }
 .prose ol { list-style: decimal; }
@@ -108,13 +260,16 @@ mark:hover + .annotation { color: #111; border-color: #999; }
 .prose em { font-style: italic; }
 .prose strong { font-weight: 600; }
 .prose a { text-decoration: underline; text-underline-offset: 2px; }
-.prose a:hover { color: #111; }
-.prose blockquote {
-  border-left: 2px solid #e8e8e8;
+.prose a:hover { color: theme('colors.neutral.900'); }
+/* :not() spares Instagram's embed, which arrives carrying its own card styling —
+   the quote bar and grey text would sit on top of it. */
+.prose blockquote:not(.instagram-media) {
+  border-left: 2px solid theme('colors.neutral.200');
   padding-left: 1rem;
-  color: #666;
+  color: theme('colors.neutral.500');
   margin: 0.1em 0 1.5em;
 }
+.prose blockquote.instagram-media { margin-inline: auto; }
 /* max-width rather than width: a 348px diagram shouldn't be upscaled to fill the bleed track. */
 .prose img { display: block; max-width: 100%; height: auto; margin-inline: auto; }
 /* fit-content keeps the figure — and so the caption — no wider than the image itself,
@@ -127,11 +282,11 @@ mark:hover + .annotation { color: #111; border-color: #999; }
 @media (max-width: 640px) {
   .figure-row { flex-direction: column; align-items: center; gap: 1.5rem; }
 }
-.prose figcaption { font-size: 0.85em; color: #888; margin-top: 0.6em; text-align: center; }
+.prose figcaption { font-size: 0.85em; color: theme('colors.neutral.500'); margin-top: 0.6em; text-align: center; }
 .prose code {
-  font-family: 'Menlo', 'Monaco', monospace;
+  font-family: theme('fontFamily.mono');
   font-size: 0.875em;
-  background: #f4f4f4;
+  background: theme('colors.white');
   padding: 0.15em 0.35em;
   border-radius: 3px;
 }
@@ -140,9 +295,9 @@ mark:hover + .annotation { color: #111; border-color: #999; }
 .tag {
   font-size: 0.8rem;
   line-height: 1;
-  color: #777;
-  background: #f6f6f6;
-  border: 1px solid #ececec;
+  color: theme('colors.neutral.500');
+  background: theme('colors.white');
+  border: 1px solid theme('colors.neutral.200');
   border-radius: 999px;
   padding: 0.35em 0.7em;
 }
@@ -150,8 +305,8 @@ mark:hover + .annotation { color: #111; border-color: #999; }
 .ai-note {
   font-size: 0.85rem;
   line-height: 1.7;
-  color: #8a6d14;
-  background: #fdf8ec;
+  color: theme('colors.yellow.700');
+  background: theme('colors.yellow.50');
   border-radius: 3px;
   padding: 0.9rem 1rem;
 }

@@ -1,16 +1,14 @@
 ---
-title: "at your service"
+title: "“at your service”"
 year: 2019
 month: 5
-description: Exploring the performance of labor, servitude, and human presence.
+description: A machine that shows what it absorbed, the way a person on shift isn't allowed to.
 tags: [installation, art, interactive]
-image: /assets/at-your-service/report/digital-pentagram.png
+image: /assets/at-your-service/report/webcam-hanging.jpg
 featured: true
 ---
 
 *at your service* was my final B.Des project at IDC, IIT Bombay, installed twice in 2019 — once in the senior classroom, once at the Design Degree Show. People were allowed to interact with it as I kept developing it over two months, and I baked in some of these stories into the final script.
-
-Here's <a href="https://www.masswerk.at/elizabot/" target="_blank" rel="noopener">the real ELIZA ↗</a> that this is a fork of – I just modified the script file to make it say things I want, and categorised some of the responses to ENUMs which the renderer can use to serve certain sentiments.
 
 ![Virtual concept mockup](/assets/at-your-service/report/virtual-mockup-2.png "Originally planned to be a tablet in the middle, within a cobweb of strings")
 
@@ -26,6 +24,8 @@ Live camera feeds were cropped into swatches and projected back onto the space. 
 
 ![vvvv patch](/assets/at-your-service/report/vvvv-node.png "vvvv patches between two laptops – talking to each other over OSC.")
 
+![The room](/assets/at-your-service/report/room-wide.jpg "The space you walked into.")
+
 ![Projection, typing](/assets/at-your-service/report/projection-typing.jpg "The modality of chat is human.")
 
 ![Projection, hands](/assets/at-your-service/report/projection-hands.jpg "“Warm fingers you have there.”")
@@ -33,24 +33,24 @@ Live camera feeds were cropped into swatches and projected back onto the space. 
 
 When the conversation turned to scrutinising you, a camera would kick in and people felt suddenly reminded they were being watched — which they liked enough that some asked for it again.
 
-![Chat output](/assets/at-your-service/report/chat-screenshot-2.png "")
-
-And yes, this was a crime scene. An artefact of me working on it over the course of the project. I baked in some fictional narratives that augmented the actual format it was built – the room changed (the AC, a dear friend, was removed), bugs were squashed (stored in a thumb drive), hard reboots (plug point sealed with tape so it doesn't plug itself out), script rewrites (the script would reveal itself as a script, and the meaning-making was all in your own head!)
-
-![Chat](/assets/at-your-service/report/chat-screenshot.png "")
-
-Post-it notes left behind by earlier visitors seeded the next person's conversation. Some were warnings, some were instructions, one just asked for patience on her behalf.
+You'd also find post-it notes left behind by earlier visitors that seeded the next person's conversation. Some were warnings, some were instructions, one just asked for patience on her behalf.
 
 ![Post-it notes](/assets/at-your-service/report/post-its.jpg "“She only means well. Treat her right.”")
 
-![Post-it notes, bugs and a USB stick](/assets/at-your-service/report/post-its-2-bugs-usb.jpg "I taped a thumb drive to the table to seed conversations about bugs")
+![Post-it notes, bugs and a USB stick](/assets/at-your-service/report/post-its-2-bugs-usb.jpg "Thumb drive taped to the table that 'stored bugs'.")
 
-What it was after: the tools we treat as servants, staged instead as entities that seem to care for us, and the absurdity of where we aim our outrage when they fail. People read the personality as feminine, decided it was mimicking me, and went looking for the bad history it kept alluding to. It got cranky and repetitive; some tried to instigate it, others left notes telling the next person to be patient with her.
+![Chat output](/assets/at-your-service/report/chat-screenshot-2.png "")
 
-![The room](/assets/at-your-service/report/room-wide.jpg "The space you walked into.")
+And yes, this was a crime scene. An artefact/evidence of me working on it over the course of the semester. I baked in some fictional narratives that augmented the actual format it was built – the room changed (the AC, a dear friend, was removed), bugs were squashed (stored in a thumb drive), hard reboots (plug point sealed with tape so it doesn't plug itself out), script rewrites (the script would reveal itself as a script, and the meaning-making was all in your own head!)
+
+![Chat](/assets/at-your-service/report/chat-screenshot.png "")
+
+What I was trying to allude to: service as an arrangement that manufactures someone you're allowed to be horrible to. This machine makes that legible because you wouldn't expect it from a machine.
 
 It worked, by the only measure that really convinced me: a friend who'd spent a while talking to it yelped in an elevator afterwards, feeling guilty for spamming the button to close the door.
 
-<a href="/atyourservice/index.html" target="_blank" rel="noopener">Talk to it ↗</a> — This is a version rewritten for web. More tweaking required for replicating the same emotions that the original installation evoked. 
+<a href="/atyourservice/index.html" target="_blank" rel="noopener">Talk to it ↗</a> — This is a version rewritten for web. More tweaking required for replicating the same emotions that the original installation evoked.
+
+Here's <a href="https://www.masswerk.at/elizabot/" target="_blank" rel="noopener">the real ELIZA ↗</a> that this is a fork of – I just modified the script file to make it say things I want, and categorised some of the responses to ENUMs which the renderer can use to serve certain sentiments.
 
 There's also a <a href="/assets/at-your-service/report0707.pdf" target="_blank" rel="noopener">project report ↗</a> (PDF, 27 MB) submitted so I can be let go from college.

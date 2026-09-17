@@ -23,23 +23,23 @@ export default function SiteHeader() {
           height={106}
           className="h-10 w-auto mb-2"
         />
-        <Link href="/" className="font-medium text-[#111] no-underline hover:text-[#555] block">
+        <Link href="/" className="font-medium text-neutral-900 no-underline hover:text-neutral-600 block">
           Jazeel Ameen
         </Link>
-        <p className="text-md text-[#999]">
+        <p className="text-md text-neutral-400">
           Product & Design at{' '}
           <a
             href="https://sortment.com"
             target="_blank"
             rel="noopener"
-            className="hover:text-[#555]"
+            className="hover:text-neutral-600"
           >
             Sortment
           </a>
         </p>
       </div>
 
-      <nav className="flex gap-6 text-sm border-b border-[#f0f0f0]">
+      <nav className="flex gap-6 text-sm border-b border-neutral-100">
         {NAV.map((item) => {
           const active =
             item.href === '/' ? pathname === '/' : pathname?.startsWith(`${item.href}/`) || pathname === item.href;
@@ -49,8 +49,8 @@ export default function SiteHeader() {
               href={item.href}
               className={`no-underline pb-3 border-b-2 -mb-px transition-colors ${
                 active
-                  ? 'text-[#111] border-[#111]'
-                  : 'text-[#999] border-transparent hover:text-[#555]'
+                  ? 'text-neutral-900 border-neutral-900'
+                  : 'text-neutral-400 border-transparent hover:text-neutral-600'
               }`}
             >
               {item.label}

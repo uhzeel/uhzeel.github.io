@@ -65,6 +65,10 @@ Project pages render markdown into a CSS grid (`.article-grid` in `app/globals.c
 - **Images on consecutive lines share a row.** Put two or three images on adjacent lines with no blank line between them and they become one `.figure-row`, sized equally and stacking below 640px. A blank line between images gives each its own row instead.
 - **Annotations can hold images**, so a small reference shot can sit in the rail as a thumbnail instead of interrupting the body: `==phrase=={{![alt](/assets/thing.png)Caption text.}}`
 - **`{{embed}}`** places the frontmatter `embed` iframe at that exact point in the body instead of after everything. It's substituted everywhere it appears, so don't write it literally in body copy. Omit it and the embed is appended at the end as before.
+- **`:::frame <colour>` … `:::`** puts a tinted, edge-to-edge band behind whatever it contains — the home for UI mockups, where controls that deliberately overshoot the edge of the mock need a surface to overshoot onto. The colour is a Tailwind palette token (`stone-100`, `yellow-50`, `neutral-900`), resolved to a hex on the `--frame-bg` custom property at build time in `lib/content.ts`, because Tailwind never scans markdown and a utility class wouldn't survive the build. An unknown token fails the build with the offending name. The band carries a nested `.article-grid`, so its contents sit on the page's normal tracks and every convention above still applies inside one — a lone image bleeds, two on consecutive lines become a row, captions work.
+- **Anything in a frame that isn't an image becomes supporting text in the rail beside the mockup**, vertically centred against it, rather than stacking underneath. `lib/content.ts` gathers all of it into a single `<aside class="frame-aside">`, because only one grid item can be pinned to the image's row. It takes full markdown. This is why the band is full-bleed in the first place: the gutter next to a `wide` image is empty, so the text costs the mockup no width. Below 1400px there isn't enough gutter to set text in and the aside folds under the image — the same trade annotations make at 960px. A `figcaption` still renders directly under the image, so a short label and a longer note can coexist. A frame with no image in it leaves its prose where it was written.
+- **`{{point 62 18}}` at the head of a rail note** drops a numbered pin on the mockup — 62% across, 18% down — and puts the same number in front of the note. Percentages, not pixels, so a pin holds its spot as the image scales. Pins number themselves in the order they're written, so inserting one renumbers the rest. Only the frame's first image takes pins, and they wrap the `<img>` rather than the `<figure>` because a figure's height includes its caption, which would throw every vertical percentage off. There's deliberately no line drawn between pin and note: that's what keeps the pairing readable when the rail folds under the image below 1400px, where an arrow would have nothing sensible to point along. Pins are pink with a dark ring, and the pin on the mockup is the same object at the same size as the one in front of the note — pink because a pin has to win against arbitrary UI underneath it and nothing in the neutral-and-yellow palette does, the ring because the fill alone can't separate it from a light mockup. This is the one place the site steps outside neutrals and yellow. Pins are `pointer-events: none`, so a click still reaches the image and opens the zoom modal — which shows the bare image, without pins.
+- **Every image in the body opens in a modal on click**, with no markup needed. `app/components/ImageZoom.tsx` delegates from the document rather than binding per image, since the body is injected with `dangerouslySetInnerHTML` and there's no React tree to hang handlers off. It also adds the tab stop and button role at runtime, so an image doesn't advertise itself as a control on a page where the JS hasn't loaded. The caption, if the figure has one, is carried into the modal.
 - **`<figure class="full">`** (raw HTML in the markdown) goes edge-to-edge. `class="bleed"` on any element opts it into the wide track.
 - **`==highlighted phrase=={{note body}}`** puts an annotation in the side rail, anchored to that phrase. The note body accepts markdown. Below 960px there's no rail, so notes fold back into the column. A bare `==highlight==` with no `{{...}}` just marks the text.
 
@@ -72,7 +76,7 @@ Annotations are absolutely positioned rather than occupying a grid track (a grid
 
 `content/projects/sandbox.md` ("Prose Sandbox") is a deliberately published page that exercises every one of these elements at once and links to its own markdown source on GitHub — it's the reference for this system, not a leftover test fixture. Keep it working when the layout changes.
 
-Sizing lives in two custom properties on `.article-grid`: `--gutter` and `--measure`. Note that `html` is `font-size: 14px`, so `1rem` is 14px and Tailwind's `px-6` is 21px, not 24px.
+Sizing lives in three custom properties on `.article-grid`: `--gutter`, `--measure` and `--wide` (how far past the measure a bleed element reaches on each side, 8rem by default). `.frame` raises `--wide` to 16rem, which is the knob for mockup width. Note that `html` is `font-size: 14px`, so `1rem` is 14px and Tailwind's `px-6` is 21px, not 24px.
 
 Projects sort newest-first by `year` (and `month`, if set) — there's no manual `order` field anymore. Ties (same year, no month) break alphabetically by title. `year`/`month` display as "2024" or "Mar 2024" depending on whether `month` is set (see `formatYearMonth` in `lib/content.ts`).
 
@@ -132,7 +136,13 @@ The extracted report images went 25 MB → 7 MB this way (four 6000×3368 photos
 
 - Font: **Rethink Sans** (Google Fonts, sans-serif)
 - Background: white `#fff`
-- Text: near-black `#111`, muted `#444`–`#999`
+- Colour comes from the Tailwind palette only — there are no hex literals left in the codebase.
+  Text is the `neutral` scale (`neutral-900` near-black, `neutral-700`/`600` body, `neutral-500`/`400`
+  muted), borders are `neutral-100` (list dividers) and `neutral-200` (rules, blockquotes, pills),
+  and the warm accents — the `mark` highlight and the `.ai-note` — are `yellow-100`/`yellow-50`/`yellow-700`.
+  In `className` use the utility (`text-neutral-500`), never `text-[#888]`. `app/globals.css` styles
+  markdown-generated HTML that carries no classes, so it reaches the same palette through Tailwind's
+  `theme()` function (`color: theme('colors.neutral.500')`) — add colour there the same way.
 - No sticky/fixed header — `app/components/SiteHeader.tsx` renders inline at the top of every page (name + role, Work/Writing nav with active-state highlighting), replacing the old per-page "← Jazeel Ameen" back-link
 - Layout: single column, max 620px wide
 

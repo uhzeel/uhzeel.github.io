@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
+import colors from 'tailwindcss/colors';
 
 const contentDir = path.join(process.cwd(), 'content');
 
@@ -97,6 +98,100 @@ function renderFigures(html: string): string {
   });
 }
 
+/**
+ * `:::frame stone-100` … `:::` — wraps mockups in a tinted, full-width band, so
+ * UI that deliberately runs past the edge of a mock has somewhere to run to.
+ */
+const FRAME_RE = /^:::frame[ \t]+(\S+)[ \t]*\r?\n([\s\S]*?)\r?\n:::[ \t]*$/gm;
+
+interface Segment {
+  /** the Tailwind colour token, when this run of markdown came from a :::frame block */
+  frame?: string;
+  markdown: string;
+}
+
+function splitFrames(markdown: string): Segment[] {
+  const segments: Segment[] = [];
+  let cursor = 0;
+  for (const match of markdown.matchAll(FRAME_RE)) {
+    segments.push({ markdown: markdown.slice(cursor, match.index) });
+    segments.push({ frame: match[1], markdown: match[2] });
+    cursor = match.index + match[0].length;
+  }
+  segments.push({ markdown: markdown.slice(cursor) });
+  return segments;
+}
+
+/**
+ * Resolves a palette token like `stone-100` to its hex value at build time, so
+ * frame colours stay inside the Tailwind palette without globals.css having to
+ * enumerate every one of them. Tailwind never scans markdown, so a utility class
+ * wouldn't survive the build.
+ */
+/** The two shapes renderFigures leaves behind for a run of images. */
+const FRAME_MEDIA_RE =
+  /<figure class="bleed">[\s\S]*?<\/figure>|<div class="figure-row bleed">[\s\S]*?<\/div>/g;
+
+/**
+ * Inside a frame, anything that isn't an image is supporting text, and it reads
+ * better beside the mockup than under it — the band is full-bleed, so the gutter
+ * next to the image is empty anyway. Pulling it into one <aside> keeps it to a
+ * single grid item, which is what lets it sit in the same row as the image
+ * rather than below it.
+ */
+function splitFrameAside(html: string): { media: string; aside: string } {
+  const media: string[] = [];
+  const rest = html.replace(FRAME_MEDIA_RE, (block) => {
+    media.push(block);
+    return '';
+  });
+  return { media: media.join(''), aside: rest.trim() };
+}
+
+/** `{{point 62 18}}` at the head of a rail note — 62% across the mockup, 18% down. */
+const POINT_RE = /\{\{point\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\}\}\s*/g;
+
+/**
+ * Numbers each `{{point}}` in document order, drops a matching pin on the
+ * mockup and leaves the number in front of the note. Percentages rather than
+ * pixels, so a pin holds its spot as the image scales between the wide track
+ * and a phone — and unlike a drawn arrow, the pairing survives the rail folding
+ * underneath the image below 1200px.
+ *
+ * The pins wrap the image rather than the figure because a figure's height
+ * includes its caption, which would throw every vertical percentage off.
+ */
+function applyFramePins(media: string, aside: string): { media: string; aside: string } {
+  const points: Array<{ x: string; y: string }> = [];
+  const numbered = aside.replace(POINT_RE, (_, x: string, y: string) => {
+    points.push({ x, y });
+    return `<span class="pin">${points.length}</span>`;
+  });
+  if (points.length === 0) return { media, aside };
+
+  const pins = points
+    .map(
+      ({ x, y }, i) =>
+        `<span class="pin pin-on-image" style="left:${x}%;top:${y}%">${i + 1}</span>`
+    )
+    .join('');
+  // Only the first image in a frame takes pins — the mockup being annotated.
+  return { media: media.replace(/<img\b[^>]*>/, (img) => `<span class="pin-target">${img}${pins}</span>`), aside: numbered };
+}
+
+function frameBackground(token: string): string {
+  const palette = colors as unknown as Record<string, string | Record<string, string>>;
+  const shade = token.match(/^([a-z]+)-(\d{2,3})$/);
+  const entry = shade ? palette[shade[1]] : palette[token];
+  const value = shade && typeof entry === 'object' ? entry[shade[2]] : entry;
+  if (typeof value !== 'string') {
+    throw new Error(
+      `Unknown :::frame colour "${token}" \u2014 expected a Tailwind palette token such as "stone-100".`
+    );
+  }
+  return value;
+}
+
 function escapeHtmlAttr(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
@@ -125,18 +220,39 @@ export async function getEntry<T = Frontmatter>(
   const embed = (frontmatter as { embed?: string }).embed;
 
   const body = applyAnnotations(content);
+  const embedInline = Boolean(embed) && body.includes(EMBED_MARKER);
+  const embedHtml = embedInline
+    ? renderEmbedHtml(embed as string, (frontmatter as { title: string }).title)
+    : '';
 
-  let contentHtml: string;
-  let embedInline = false;
-  if (embed && body.includes(EMBED_MARKER)) {
-    const parts = body.split(EMBED_MARKER);
-    const htmlParts = await Promise.all(parts.map((part) => marked(part)));
-    contentHtml = htmlParts.join(renderEmbedHtml(embed, (frontmatter as { title: string }).title));
-    embedInline = true;
-  } else {
-    contentHtml = await marked(body);
-  }
-  contentHtml = renderFigures(contentHtml);
+  /** One run of markdown, with the iframe substituted wherever the marker appears. */
+  const renderRun = async (markdown: string): Promise<string> => {
+    const parts = embedInline ? markdown.split(EMBED_MARKER) : [markdown];
+    const html = await Promise.all(parts.map((part) => marked(part)));
+    return renderFigures(html.join(embedHtml));
+  };
+
+  // Frames are split out of the markdown rather than matched in the rendered
+  // HTML because their contents have to go through marked themselves — a frame
+  // holding two images on consecutive lines should still become a figure row.
+  const contentHtml = (
+    await Promise.all(
+      splitFrames(body).map(async (segment) => {
+        const html = await renderRun(segment.markdown);
+        if (!segment.frame) return html;
+        const { media, aside } = splitFrameAside(html);
+        // With no image to sit beside, prose has no rail to go in and stays put.
+        let inner = html;
+        if (media && aside) {
+          const pinned = applyFramePins(media, aside);
+          inner = `${pinned.media}<aside class="frame-aside">${pinned.aside}</aside>`;
+        }
+        // The nested article-grid keeps the mockup on the same tracks as the
+        // rest of the page while the band itself runs edge to edge.
+        return `<section class="frame full article-grid" style="--frame-bg:${frameBackground(segment.frame)}">${inner}</section>`;
+      })
+    )
+  ).join('');
 
   return {
     slug,

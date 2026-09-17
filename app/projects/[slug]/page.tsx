@@ -1,5 +1,7 @@
 import { getCollection, getEntry, formatYearMonth, type ProjectFrontmatter } from '@/lib/content';
 import BackLink from '../../components/BackLink';
+import ImageZoom from '../../components/ImageZoom';
+import InstagramEmbed from '../../components/InstagramEmbed';
 
 export const dynamicParams = false;
 
@@ -27,8 +29,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <article>
         <header className="max-w-prose mx-auto px-6 mb-8">
           <h1 className="text-lg font-medium mb-2">{data.title}</h1>
-          <p className="text-[#555] leading-relaxed mb-3">{data.description}</p>
-          <p className="text-sm text-[#888]">{formatYearMonth(data)}</p>
+          <p className="text-neutral-600 leading-relaxed mb-3">{data.description}</p>
+          <p className="text-sm text-neutral-500">{formatYearMonth(data)}</p>
           {data.tags && data.tags.length > 0 && (
             <ul className="flex flex-wrap gap-2 mt-3">
               {data.tags.map((tag) => (
@@ -48,10 +50,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         {contentHtml && (
           <div
-            className="prose article-grid text-[#333] mb-10"
+            className="prose article-grid text-neutral-700 mb-10"
             dangerouslySetInnerHTML={{ __html: contentHtml }}
           />
         )}
+
+        {contentHtml && <ImageZoom />}
+        {contentHtml?.includes('instagram-media') && <InstagramEmbed />}
 
         {data.embed && !embedInline && (
           <div className="article-grid mb-10">
