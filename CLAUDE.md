@@ -28,6 +28,7 @@ title: "My Post Title"
 date: 2026-04-30
 description: "Optional one-liner shown in listings"
 tags: [tag1, tag2]
+draft: true          # optional — hides it from the list AND skips building its page entirely
 ---
 
 Write your post here in plain markdown.
@@ -41,18 +42,46 @@ Create `content/projects/my-project.md`:
 ---
 title: "Project Name"
 year: 2024
+month: 3                    # optional, 1-12 — refines ordering/display within the same year
 description: "One sentence shown in the project list"
 tags: [art, interactive]
-embed: /my-project/        # optional — loads this URL in an iframe on the project page
-order: 6                   # controls sort order in listings
+embed: /my-project/index.html   # optional — loads this URL in an iframe on the project page
 featured: true
+aiAssisted: true            # optional — shows the "written with AI" note above the body copy
+draft: true                 # optional — hides it from the list AND skips building its page entirely
 ---
 
 Write about the project here. Markdown supported.
 ```
 
+Point `embed` at the `index.html` file, not the folder — `next dev` doesn't resolve directory indexes inside `public/`, so `/my-project/` 404s locally even though GitHub Pages serves it fine.
+
+### Project page layout (bleed, full-bleed, annotations)
+
+Project pages render markdown into a CSS grid (`.article-grid` in `app/globals.css`) whose centre track is the normal text measure, with wider tracks on either side. Nothing here needs a plugin — it's all plain markdown plus a few conventions:
+
+- **A standalone image bleeds automatically.** `![alt](/assets/thing.png)` on its own line widens into the side tracks. No syntax needed.
+- **Captions use markdown's native title slot.** `![alt](/assets/thing.png "The caption")` renders a `<figure>` with a `<figcaption>`. Leave the title empty (`""`) as a placeholder and no caption element is emitted.
+- **Images on consecutive lines share a row.** Put two or three images on adjacent lines with no blank line between them and they become one `.figure-row`, sized equally and stacking below 640px. A blank line between images gives each its own row instead.
+- **Annotations can hold images**, so a small reference shot can sit in the rail as a thumbnail instead of interrupting the body: `==phrase=={{![alt](/assets/thing.png)Caption text.}}`
+- **`{{embed}}`** places the frontmatter `embed` iframe at that exact point in the body instead of after everything. It's substituted everywhere it appears, so don't write it literally in body copy. Omit it and the embed is appended at the end as before.
+- **`<figure class="full">`** (raw HTML in the markdown) goes edge-to-edge. `class="bleed"` on any element opts it into the wide track.
+- **`==highlighted phrase=={{note body}}`** puts an annotation in the side rail, anchored to that phrase. The note body accepts markdown. Below 960px there's no rail, so notes fold back into the column. A bare `==highlight==` with no `{{...}}` just marks the text.
+
+Annotations are absolutely positioned rather than occupying a grid track (a grid row can only align to whole blocks, not to a phrase mid-paragraph) and deliberately specify no `top`, so they inherit their static position — the line the highlight falls on — without adding height to the paragraph. A float can't be used here: grid items contain their floats, which made the body copy open up a gap the size of the note. The cost of being out of flow is that notes don't stack, so two anchored within a few lines of each other will overlap, as will a note landing beside a bleed image.
+
+`content/projects/sandbox.md` ("Prose Sandbox") is a deliberately published page that exercises every one of these elements at once and links to its own markdown source on GitHub — it's the reference for this system, not a leftover test fixture. Keep it working when the layout changes.
+
+Sizing lives in two custom properties on `.article-grid`: `--gutter` and `--measure`. Note that `html` is `font-size: 14px`, so `1rem` is 14px and Tailwind's `px-6` is 21px, not 24px.
+
+Projects sort newest-first by `year` (and `month`, if set) — there's no manual `order` field anymore. Ties (same year, no month) break alphabetically by title. `year`/`month` display as "2024" or "Mar 2024" depending on whether `month` is set (see `formatYearMonth` in `lib/content.ts`).
+
+The Work page (`/projects`, the "Work" tab) is one flat, newest-first list. There used to be a `category: work | project` field splitting it into Work/Projects subsections; it was removed since every entry was a `project`. Reintroduce it if paid-employment entries ever need separating.
+
+A project page's header runs title → description → date → tags, with tags as pills (`.tag` in `globals.css`). `aiAssisted: true` in the frontmatter renders the AI-assistance note (`.ai-note`) between the header and the body; the wording lives in `app/projects/[slug]/page.tsx`, not in the markdown.
+
 ### Add a standalone interactive tool / experiment
-Drop the entire self-contained app (HTML + JS) into `public/my-tool/`. It becomes available at `uhzeel.github.io/my-tool/` with no framework overhead — completely isolated. Then add a project markdown file pointing to it with `embed: /my-tool/`.
+Drop the entire self-contained app (HTML + JS) into `public/my-tool/`. It becomes available at `uhzeel.github.io/my-tool/` with no framework overhead — completely isolated. Then add a project markdown file pointing to it with `embed: /my-tool/index.html`.
 
 This is how the existing experiments work:
 - `public/threeone/` → gaussian splats
@@ -62,17 +91,28 @@ This is how the existing experiments work:
 
 ## Asset storage (`public/assets/`)
 
-`public/assets/` is a holding folder for files not yet wired up to the site — raw material and fodder for future work. Jazeel was using the old site root as a dumping ground for things to revisit. These live at `/assets/filename` when deployed.
+Assets are filed per project, in a folder named after the project's slug, so an asset's owner is obvious from its path. These live at `/assets/<slug>/<filename>` when deployed.
 
-Current contents and what they might be for:
-- `jazeel12pm.pdf` — CV, actively linked from the home page
-- `report0707.pdf` — writeup explaining the "at your service" project (was linked in the old site)
-- `wli.png` — Wretched Light Industries logo/asset (installation art work)
-- `elizax.png` — image likely related to the "at your service" Eliza chatbot piece
-- `trapped.gif` — unknown, possibly a project asset or animation
-- `p5sketches.txt` — notes or code snippets for p5.js sketches
+```
+public/assets/
+  Jazeel - September 2026.pdf   ← current CV, linked from the home page (not project-scoped, stays at root)
+  at-your-service/
+    report0707.pdf              ← B.Des project report, linked from the project page
+    report/                     ← 31 images extracted from that PDF
+    elizax.png
+  take-me-lightly/wli.png       ← Wretched Light Industry logo, used as the project thumbnail
+  p5-sketch/p5sketches.txt
+  sandbox/placeholder-wide.svg
+  unsorted/                     ← owner unknown; file it under a slug when that changes
+    jazeel12pm.pdf              ← superseded CV, no longer linked anywhere
+    trapped.gif
+```
 
-When building out project pages, check here first — there may be assets already waiting.
+When adding a project asset, make the folder if it doesn't exist and reference it as `/assets/<slug>/<file>`. When building out project pages, check the project's folder and `unsorted/` first — there may be material already waiting.
+
+**Watch the weight.** Git keeps every blob forever, so compress images *before* the first commit. `sips` ships with macOS and is enough: `sips -Z 2400 -s format jpeg -s formatOptions 85 in.jpg --out out.jpg`. Photographs belong in JPEG; keep PNG only for screenshots, diagrams and anything with crisp text, where JPEG rings around the edges.
+
+The extracted report images went 25 MB → 7 MB this way (four 6000×3368 photos resampled to 2400px, two photographic PNGs moved to JPEG). The originals all still live inside `report0707.pdf`, so re-extracting at full resolution is always possible — which also means that 25 MB PDF, not the images, is now the biggest thing in the repo.
 
 ## Key files
 
@@ -86,14 +126,14 @@ When building out project pages, check here first — there may be assets alread
 | `lib/content.ts` | Reads markdown files, parses frontmatter, returns data to pages |
 | `next.config.ts` | `output: 'export'` and `trailingSlash: true` — required for GitHub Pages |
 | `.github/workflows/deploy.yml` | Builds and deploys to GitHub Pages on push to master |
-| `tailwind.config.ts` | Font (Inter) and max-width |
+| `tailwind.config.ts` | Font (Rethink Sans) and max-width |
 
 ## Design
 
-- Font: **Inter** (Google Fonts, sans-serif)
+- Font: **Rethink Sans** (Google Fonts, sans-serif)
 - Background: white `#fff`
 - Text: near-black `#111`, muted `#444`–`#999`
-- No sticky header — each page has its own minimal back-link
+- No sticky/fixed header — `app/components/SiteHeader.tsx` renders inline at the top of every page (name + role, Work/Writing nav with active-state highlighting), replacing the old per-page "← Jazeel Ameen" back-link
 - Layout: single column, max 620px wide
 
 ## Running locally

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Rethink_Sans } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({
+const rethinkSans = Rethink_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-sans',
   display: 'swap',
 });
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={rethinkSans.variable}>
       <body className="font-sans antialiased">
         {children}
       </body>

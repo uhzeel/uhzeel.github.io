@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getCollection, type BlogFrontmatter } from '@/lib/content';
+import SiteHeader from '../components/SiteHeader';
 
 export const metadata = { title: 'Writing — uhweb' };
 
@@ -10,11 +11,7 @@ export default async function BlogPage() {
 
   return (
     <main className="max-w-prose mx-auto px-6 py-16">
-      <Link href="/" className="text-sm text-[#999] hover:text-[#111] no-underline block mb-12">
-        ← Jazeel Ameen
-      </Link>
-
-      <p className="text-xs uppercase tracking-widest text-[#999] mb-8">Writing</p>
+      <SiteHeader />
 
       {posts.length === 0 ? (
         <p className="text-[#888]">Nothing here yet.</p>

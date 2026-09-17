@@ -5,8 +5,8 @@
 @layer base {
   html {
     background: #fff;
-    color: #111;
-    font-size: 15px;
+    color: #101010;
+    font-size: 14px;
   }
 
   a {
@@ -20,24 +20,138 @@
   }
 }
 
+/* Centre column stays at the site measure; the wide/full tracks let embeds and
+   images escape it without ever touching the viewport edge. */
+.article-grid {
+  --gutter: 1.5rem;
+  --measure: calc(620px - var(--gutter) * 2);
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(var(--gutter), 1fr)
+    [wide-start] minmax(0, 8rem)
+    [content-start] min(var(--measure), 100% - var(--gutter) * 2) [content-end]
+    minmax(0, 8rem) [wide-end]
+    minmax(var(--gutter), 1fr) [full-end];
+}
+
+.article-grid > * { grid-column: content; }
+.article-grid > .bleed,
+.article-grid > p:has(> img:only-child) { grid-column: wide; }
+.article-grid > .full { grid-column: full; }
+
+/* Anchored side notes. These float out of the content column rather than taking
+   a grid track, because a note has to sit beside the phrase it annotates and a
+   grid row can only align to whole blocks. The highlight is unscoped because the
+   home page hand-writes a mark/annotation pair outside any .prose container. */
+mark {
+  background: #fbf1a9;
+  color: inherit;
+  padding: 0 0.12em;
+  border-radius: 2px;
+}
+
+.prose p,
+.prose li,
+.prose blockquote { position: relative; }
+
+/* No `top`: the note keeps its static position — the line the highlight sits on —
+   while staying out of flow, so the paragraph doesn't grow to fit it. A float
+   would be trapped here, since grid items contain their floats. */
+.annotation {
+  position: absolute;
+  right: calc(-10rem - 1.5rem);
+  width: 10rem;
+  padding-top: 0.5em;
+  border-top: 1px solid #e8e8e8;
+  font-size: 0.85em;
+  line-height: 1.6;
+  color: #777;
+  text-align: left;
+}
+.annotation p { margin-bottom: 0.6em; line-height: 1.6; }
+.annotation p:last-child { margin-bottom: 0; }
+.annotation img { margin-bottom: 0.5em; }
+mark:hover + .annotation { color: #111; border-color: #999; }
+
+/* No rail left to put them in — fold notes back into the column. */
+@media (max-width: 960px) {
+  .annotation {
+    position: static;
+    display: block;
+    width: auto;
+    margin: 1.2em 0;
+    padding: 0.75em 0 0.75em 1rem;
+    border-top: none;
+    border-left: 2px solid #e8e8e8;
+  }
+}
+
+.embed-frame {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid #e8e8e8;
+  background: #111;
+  margin: 2.5rem 0;
+}
+.embed-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+
 .prose p { margin-bottom: 1.4em; line-height: 1.8; }
 .prose p:last-child { margin-bottom: 0; }
-.prose h2 { font-size: 1rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.5rem; }
-.prose h3 { font-size: 0.95rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.4rem; }
+/* Grid items don't collapse margins, so these top margins are only the *extra*
+   space beyond the 1.4em the previous element already contributes. */
+.prose h2 { font-size: 1rem; font-weight: 600; margin-top: 0.6rem; margin-bottom: 0.5rem; }
+.prose h3 { font-size: 0.95rem; font-weight: 600; margin-top: 0.1rem; margin-bottom: 0.4rem; }
 .prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1.4em; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
 .prose li { margin-bottom: 0.3em; line-height: 1.7; }
 .prose em { font-style: italic; }
 .prose strong { font-weight: 600; }
+.prose a { text-decoration: underline; text-underline-offset: 2px; }
+.prose a:hover { color: #111; }
 .prose blockquote {
   border-left: 2px solid #e8e8e8;
   padding-left: 1rem;
   color: #666;
-  margin: 1.5em 0;
+  margin: 0.1em 0 1.5em;
 }
+/* max-width rather than width: a 348px diagram shouldn't be upscaled to fill the bleed track. */
+.prose img { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+/* fit-content keeps the figure — and so the caption — no wider than the image itself,
+   so a small diagram's caption doesn't run the full width of the bleed track. */
+.prose figure { width: fit-content; max-width: 100%; margin: 0 auto 1.4em; }
+
+/* Images written on consecutive markdown lines share a row; one per line stacks. */
+.figure-row { display: flex; gap: 0.75rem; align-items: flex-start; margin: 2rem 0; }
+.figure-row > figure { flex: 1 1 0; min-width: 0; margin: 0; }
+@media (max-width: 640px) {
+  .figure-row { flex-direction: column; align-items: center; gap: 1.5rem; }
+}
+.prose figcaption { font-size: 0.85em; color: #888; margin-top: 0.6em; text-align: center; }
 .prose code {
   font-family: 'Menlo', 'Monaco', monospace;
   font-size: 0.875em;
   background: #f4f4f4;
   padding: 0.15em 0.35em;
   border-radius: 3px;
+}
+
+/* Header metadata: tag pills and the AI-assistance note that sits above the body. */
+.tag {
+  font-size: 0.8rem;
+  line-height: 1;
+  color: #777;
+  background: #f6f6f6;
+  border: 1px solid #ececec;
+  border-radius: 999px;
+  padding: 0.35em 0.7em;
+}
+
+.ai-note {
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: #8a6d14;
+  background: #fdf8ec;
+  border-radius: 3px;
+  padding: 0.9rem 1rem;
 }
