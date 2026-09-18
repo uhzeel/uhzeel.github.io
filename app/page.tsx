@@ -22,7 +22,7 @@ export default function Home() {
             Shopflo was recently acquired by Pine Labs. I&apos;ve exited with the founders
             and a sharp team to focus on Sortment&apos;s success.
           </span>
-          {' '}
+          {'  '}
           <a href="https://sortment.com" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-neutral-900">Sortment</a>
           {' '}— an agentic customer engagement platform for lifecycle marketers,
           native to the data warehouse.
@@ -31,8 +31,9 @@ export default function Home() {
         </p>
         <p>
           I don't really have a shareable static portfolio — 
-          been neck deep in building for the last 4 years. 
-          This site acts as a placeholder tombstone, and a way to reach me. 
+          been neck deep in building for the last 4 years, so any '<a href="/projects" rel="noopener" className="underline underline-offset-2 hover:text-neutral-900">projects</a>' you find are still being written out as and when I find time - with no regard for curation, I'm just pushing everything to main haha. 
+        </p>
+        <p>This site acts as a placeholder, and a way to reach me. 
           If you want to see more of my work, or just chat about building products, feel free to reach out.
         </p>
       </div>

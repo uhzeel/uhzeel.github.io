@@ -14,32 +14,36 @@ export default function SiteHeader() {
 
   return (
     <header className="mb-12">
-      <div className="mb-6">
+      {/* The gif's height is set in CSS, not by the height attribute — an
+          attribute is only an aspect-ratio hint and loses to any CSS height. */}
+      <div className="flex items-stretch gap-8 border-b border-neutral-200">
         <img
-          src="/assets/trapped.gif"
+          src="/assets/trapped-slow4x.gif"
           alt=""
           aria-hidden="true"
-          width={128}
-          height={106}
-          className="h-10 w-auto mb-2"
+          
+          className="h-[84px] w-auto shrink-0 object-contain select-none"
         />
-        <Link href="/" className="font-medium text-neutral-900 no-underline hover:text-neutral-600 block">
-          Jazeel Ameen
-        </Link>
-        <p className="text-md text-neutral-400">
-          Product & Design at{' '}
-          <a
-            href="https://sortment.com"
-            target="_blank"
-            rel="noopener"
-            className="hover:text-neutral-600"
-          >
-            Sortment
-          </a>
-        </p>
+
+        <div className="py-6">
+          <Link href="/" className="font-medium text-neutral-900 no-underline hover:text-neutral-600 block">
+            Jazeel Ameen
+          </Link>
+          <p className="text-md text-neutral-600">
+            Product & Design ·{' '}
+            <a
+              href="https://sortment.com"
+              target="_blank"
+              rel="noopener"
+              className="underline decoration-neutral-300 hover:text-neutral-900 hover:decoration-neutral-900 transition-colors"
+            >
+              Sortment
+            </a>
+          </p>
+        </div>
       </div>
 
-      <nav className="flex gap-6 text-sm border-b border-neutral-100">
+      <nav className="flex text-md border-b border-neutral-200">
         {NAV.map((item) => {
           const active =
             item.href === '/' ? pathname === '/' : pathname?.startsWith(`${item.href}/`) || pathname === item.href;
@@ -47,9 +51,9 @@ export default function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
-              className={`no-underline pb-3 border-b-2 -mb-px transition-colors ${
+              className={`no-underline px-4 py-3 border-b-2 -mb-px transition-colors ${
                 active
-                  ? 'text-neutral-900 border-neutral-900'
+                  ? 'text-neutral-900 font-medium bg-neutral-100'
                   : 'text-neutral-400 border-transparent hover:text-neutral-600'
               }`}
             >

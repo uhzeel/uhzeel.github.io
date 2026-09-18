@@ -78,14 +78,22 @@ mark {
 .annotation img { margin-bottom: 0.5em; }
 mark:hover + .annotation { color: theme('colors.neutral.900'); border-color: theme('colors.neutral.400'); }
 
-/* No rail left to put them in — fold notes back into the column. */
+/* No rail left to put them in — fold notes back into the column. A float at full
+   width, not a block: a block closes the line, so the sentence stops dead right
+   after the highlight and leaves the rest of that line empty. A float is out of
+   flow, so the text after the highlight finishes its line as if the note weren't
+   there; the note, too wide to share a line, drops below that line, and the
+   paragraph picks up again underneath it.
+   Floats are contained by the paragraph here (a grid item establishes a BFC),
+   which out in the rail was the problem — in the column it's what we want, since
+   the note should take real space rather than overlap the lines below. */
 @media (max-width: 960px) {
   .annotation {
     position: static;
-    display: block;
-    width: auto;
-    margin: 1.2em 0;
-    padding: 0.75em 0 0.75em 1rem;
+    float: left;
+    width: 100%;
+    margin: 0.9em 0;
+    padding: 0.75em 0 0.1em 1rem;
     border-top: none;
     border-left: 2px solid theme('colors.neutral.200');
   }
@@ -309,4 +317,43 @@ dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; 
   background: theme('colors.yellow.50');
   border-radius: 3px;
   padding: 0.9rem 1rem;
+}
+
+/* Work-list hover/focus preview. The panel sits outside the measure entirely,
+   so it only exists once the viewport can hold 14rem clear of the column —
+   below that the inline thumbnail carries the same image instead. */
+.project-preview { display: none; }
+
+@media (min-width: 1180px) {
+  .project-thumb { display: none; }
+
+  .project-preview {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-left: 2.5rem;
+    width: 14rem;
+    pointer-events: none;
+    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Stacked, so the panel cross-fades between projects rather than reflowing,
+     and every image is decoded before it's ever asked to appear. */
+  .project-preview img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .project-preview img.is-active { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-preview,
+  .project-preview img { transition: none; }
 }

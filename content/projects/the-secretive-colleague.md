@@ -1,5 +1,5 @@
 ---
-title: "Sortment Quests · The secretive colleague..."
+title: "*sortment Quests · The secretive colleague..."
 year: 2026
 month: 8
 description: ...posing as an open book.
@@ -64,10 +64,11 @@ Internally, we **renamed the parent steps to Milestones**, and force the LLM to 
 :::frame stone-100
 ![Quest Plan](/assets/sortment/plan-vX.png "Simplified.")
 
+{{point 12 55}} **Collapsable steps.** Milestones first.
 
 {{point 90 40}} **What's going on right now?** Outcome-first + Expose current sub-agent title.
 
-{{point 12 55}} **Collapsable steps.** Milestones first.
+
 :::
 
 ### Structure

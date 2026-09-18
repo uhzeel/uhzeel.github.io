@@ -1,5 +1,5 @@
 ---
-title: "Prose Sandbox"
+title: "Prose Sandbox [tester]"
 year: 2026
 month: 9
 description: A living reference for how pages here are put together — text measure, bleed widths, full-bleed images and side annotations.
