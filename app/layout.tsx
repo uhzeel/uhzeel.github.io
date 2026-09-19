@@ -4,7 +4,7 @@ import './globals.css';
 
 const rethinkSans = Rethink_Sans({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-rethink',
   display: 'swap',
 });
 

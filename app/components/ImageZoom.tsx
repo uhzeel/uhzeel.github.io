@@ -32,7 +32,9 @@ export default function ImageZoom() {
   }, []);
 
   useEffect(() => {
-    document.querySelectorAll<HTMLImageElement>('.prose img').forEach((img) => {
+    // A sketch thumbnail is already inside a <button> that opens the sketch —
+    // it's not its own control, and clicking it must not also zoom the still.
+    document.querySelectorAll<HTMLImageElement>('.prose img:not(.sketch-thumb img)').forEach((img) => {
       img.tabIndex = 0;
       img.setAttribute('role', 'button');
       img.setAttribute('aria-haspopup', 'dialog');
@@ -40,7 +42,8 @@ export default function ImageZoom() {
 
     const imageFrom = (event: Event) => {
       const target = event.target;
-      return target instanceof HTMLImageElement && target.closest('.prose') ? target : null;
+      if (!(target instanceof HTMLImageElement) || !target.closest('.prose')) return null;
+      return target.closest('.sketch-thumb') ? null : target;
     };
 
     const onClick = (event: MouseEvent) => {

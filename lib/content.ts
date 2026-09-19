@@ -5,8 +5,9 @@ import { marked } from 'marked';
 import colors from 'tailwindcss/colors';
 
 const contentDir = path.join(process.cwd(), 'content');
+const publicDir = path.join(process.cwd(), 'public');
 
-export type Collection = 'projects' | 'blog';
+export type Collection = 'projects' | 'writing';
 
 export interface ProjectFrontmatter {
   title: string;
@@ -19,22 +20,31 @@ export interface ProjectFrontmatter {
   /** path under /public, e.g. "/assets/take-me-lightly/wli.png" — shown as a thumbnail in the list and on the project page */
   image?: string;
   featured?: boolean;
-  /** set true to show the AI-assistance note above the body copy */
-  aiAssisted?: boolean;
   /** set true to hide from the list and exclude from the build entirely */
   draft?: boolean;
 }
 
-export interface BlogFrontmatter {
+/**
+ * Writing dates the same way projects do — `year` plus an optional `month` —
+ * rather than a full `date`, so the two collections sort and display through
+ * the same `sortByDate`/`formatYearMonth`. A day-level date has nowhere to show
+ * up in a list that reads "Sep 2026".
+ */
+export interface WritingFrontmatter {
   title: string;
-  date: string;
+  year: number;
+  /** 1-12, optional — refines sort order and date display within the same year */
+  month?: number;
+  /** one-liner under the title in the list; optional, unlike a project's */
   description?: string;
   tags?: string[];
+  /** nothing reads this yet — reserved for pulling a post out on the home page */
+  featured?: boolean;
   /** set true to hide from the list and exclude from the build entirely */
   draft?: boolean;
 }
 
-export type Frontmatter = ProjectFrontmatter | BlogFrontmatter;
+export type Frontmatter = ProjectFrontmatter | WritingFrontmatter;
 
 export interface Entry<T = Frontmatter> {
   slug: string;
@@ -46,11 +56,33 @@ export interface Entry<T = Frontmatter> {
 
 /** Marker authors can drop into a project's markdown body to position the iframe embed inline, e.g. between two paragraphs. */
 const EMBED_MARKER = '{{embed}}';
+/** Splits the body on the marker, keeping it as its own piece. */
+const MARKER_SPLIT_RE = /(\{\{embed\}\})/;
 
 /** ==highlighted text=={{note body}} — the note is anchored to that phrase and rendered in the side rail. */
 const ANNOTATION_RE = /==([^=\n]+)==\{\{([\s\S]+?)\}\}/g;
 /** A bare ==highlight== with no note attached. */
 const HIGHLIGHT_RE = /==([^=\n]+)==/g;
+/** An image anywhere in a note body makes it a rail thumbnail, whatever its length. */
+const NOTE_IMAGE_RE = /!\[[^\]]*\]\([^)]*\)/;
+
+/**
+ * Past this many characters of visible text, a note is taller than the paragraph
+ * it hangs off and collides with whatever follows — notes are out of flow, so
+ * they don't stack. The rail is 10rem at 14px type, roughly 22 characters a line,
+ * so this is about 13 lines. Over it, the note folds into the column at every
+ * width instead (`.annotation.inline` in globals.css).
+ */
+const INLINE_NOTE_CHARS = 280;
+
+/** What the reader actually sees, so a long href doesn't count toward rail height. */
+function noteTextLength(note: string): number {
+  return note
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[*_`~]/g, '')
+    .trim().length;
+}
 
 function applyAnnotations(markdown: string): string {
   // Odd indices are fenced code blocks, which must pass through untouched.
@@ -60,11 +92,14 @@ function applyAnnotations(markdown: string): string {
       i % 2 === 1
         ? chunk
         : chunk
-            .replace(
-              ANNOTATION_RE,
-              (_, text, note) =>
-                `<mark>${text}</mark><span class="annotation">${note.trim()}</span>`
-            )
+            .replace(ANNOTATION_RE, (_, text, note) => {
+              const body = (note as string).trim();
+              const inline =
+                !NOTE_IMAGE_RE.test(body) && noteTextLength(body) > INLINE_NOTE_CHARS;
+              return `<mark>${text}</mark><span class="annotation${
+                inline ? ' inline' : ''
+              }">${body}</span>`;
+            })
             .replace(HIGHLIGHT_RE, (_, text) => `<mark>${text}</mark>`)
     )
     .join('');
@@ -101,12 +136,16 @@ function renderFigures(html: string): string {
 /**
  * `:::frame stone-100` … `:::` — wraps mockups in a tinted, full-width band, so
  * UI that deliberately runs past the edge of a mock has somewhere to run to.
+ * A trailing `narrow` (`:::frame stone-100 narrow`) keeps the band at the width
+ * of the text column instead, for an image that shouldn't bleed at all.
  */
-const FRAME_RE = /^:::frame[ \t]+(\S+)[ \t]*\r?\n([\s\S]*?)\r?\n:::[ \t]*$/gm;
+const FRAME_RE = /^:::frame[ \t]+([^\n]+?)[ \t]*\r?\n([\s\S]*?)\r?\n:::[ \t]*$/gm;
 
 interface Segment {
   /** the Tailwind colour token, when this run of markdown came from a :::frame block */
   frame?: string;
+  /** `narrow` on the opening line — band at the text measure rather than full bleed */
+  narrow?: boolean;
   markdown: string;
 }
 
@@ -115,7 +154,18 @@ function splitFrames(markdown: string): Segment[] {
   let cursor = 0;
   for (const match of markdown.matchAll(FRAME_RE)) {
     segments.push({ markdown: markdown.slice(cursor, match.index) });
-    segments.push({ frame: match[1], markdown: match[2] });
+    const [colour, ...modifiers] = match[1].split(/[ \t]+/);
+    const unknown = modifiers.find((m) => m !== 'narrow');
+    if (unknown) {
+      throw new Error(
+        `Unknown :::frame modifier "${unknown}" \u2014 the only one is "narrow".`
+      );
+    }
+    segments.push({
+      frame: colour,
+      narrow: modifiers.includes('narrow'),
+      markdown: match[2],
+    });
     cursor = match.index + match[0].length;
   }
   segments.push({ markdown: markdown.slice(cursor) });
@@ -200,6 +250,93 @@ function renderEmbedHtml(embed: string, title: string): string {
   return `<div class="bleed embed-frame"><iframe src="${escapeHtmlAttr(embed)}" title="${escapeHtmlAttr(title)}" allow="fullscreen" loading="lazy"></iframe></div>`;
 }
 
+/** Whose p5 editor account the bare ids in {{sketch}} belong to. */
+const P5_USER = 'uhzeel';
+
+/**
+ * `{{sketch abvLra5Ou 400 shame on you scrolling diamond}}` — one tile in a
+ * sketch grid: the editor id, the canvas's natural width in px, then the
+ * caption, which runs to the closing braces and needs no quoting.
+ */
+const SKETCH_RE = /\{\{sketch\s+([A-Za-z0-9_-]+)(?:\s+(\d+))?\s*([^}]*?)\s*\}\}/g;
+
+/**
+ * What a thumbnail may be saved as, in the order they're tried. A screenshot is
+ * usually a PNG and a photograph a JPEG, and which one a sketch got shouldn't
+ * have to be written down anywhere — the name is derived from the caption, so
+ * the extension is found rather than declared.
+ */
+const THUMB_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.avif'];
+
+/** A thumbnail is filed under the project, named after the sketch. */
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+/**
+ * One tile: a button carrying everything the modal needs.
+ *
+ * Deliberately not a live iframe. Every p5 editor embed boots the whole editor
+ * app, so a grid of them would load several before the reader has asked for
+ * any; app/components/SketchModal.tsx mounts the iframe only on click. `size`
+ * travels with it because a p5 canvas is created at fixed pixel dimensions and
+ * the editor never scales it, so the modal has to scale the iframe itself.
+ */
+function renderSketch(id: string, size: string | undefined, title: string, projectSlug: string): string {
+  const embed = `https://editor.p5js.org/${P5_USER}/embed/${id}`;
+  const href = `https://editor.p5js.org/${P5_USER}/sketches/${id}`;
+  // A thumbnail that isn't on disk yet falls back to a card rather than a
+  // broken image, so a sketch can be written up before it's been captured.
+  const base = title ? `/assets/${projectSlug}/${slugify(title)}` : '';
+  const thumb = base
+    ? THUMB_EXTENSIONS.map((ext) => base + ext).find((rel) =>
+        fs.existsSync(path.join(publicDir, rel))
+      )
+    : undefined;
+  // The still is decorative — the caption underneath names the sketch, and the
+  // button carries the accessible name.
+  const face = thumb
+    ? `<img src="${escapeHtmlAttr(thumb)}" alt="" loading="lazy">`
+    : '<span class="sketch-run">run sketch</span>';
+  const caption = title
+    ? `<figcaption><a href="${escapeHtmlAttr(href)}" target="_blank" rel="noopener">${title}</a></figcaption>`
+    : '';
+  return (
+    `<figure class="sketch">` +
+    `<button type="button" class="sketch-thumb" aria-haspopup="dialog" data-embed="${escapeHtmlAttr(embed)}"` +
+    `${size ? ` data-size="${size}"` : ''} data-title="${escapeHtmlAttr(title)}" data-href="${escapeHtmlAttr(href)}">` +
+    `${face}<span class="sr-only">Run ${escapeHtmlAttr(title || 'sketch')}</span></button>` +
+    `${caption}</figure>`
+  );
+}
+
+/**
+ * Turns a paragraph of nothing but {{sketch}} markers into a grid — the same
+ * rule images follow, where consecutive lines share a row and a blank line
+ * starts a new one. Written against the rendered HTML rather than the markdown
+ * for that reason: marked has already decided what a paragraph is.
+ */
+function renderSketches(html: string, projectSlug: string): string {
+  return html.replace(/<p>([\s\S]*?)<\/p>/g, (whole, inner: string) => {
+    const markers = inner.match(SKETCH_RE);
+    if (!markers) return whole;
+    const leftover = inner.replace(SKETCH_RE, '').replace(/<br\s*\/?>/g, '').trim();
+    // A marker mid-sentence stays where it is; this is for a paragraph of them.
+    if (leftover) return whole;
+
+    const tiles = markers
+      .map((marker) => {
+        const [, id, size, title] = new RegExp(SKETCH_RE.source).exec(marker) as RegExpExecArray;
+        return renderSketch(id, size, title, projectSlug);
+      })
+      .join('');
+    return `<div class="sketch-grid">${tiles}</div>`;
+  });
+}
+
 export function getSlugs(collection: Collection): string[] {
   const dir = path.join(contentDir, collection);
   if (!fs.existsSync(dir)) return [];
@@ -224,12 +361,16 @@ export async function getEntry<T = Frontmatter>(
   const embedHtml = embedInline
     ? renderEmbedHtml(embed as string, (frontmatter as { title: string }).title)
     : '';
-
   /** One run of markdown, with the iframe substituted wherever the marker appears. */
   const renderRun = async (markdown: string): Promise<string> => {
-    const parts = embedInline ? markdown.split(EMBED_MARKER) : [markdown];
-    const html = await Promise.all(parts.map((part) => marked(part)));
-    return renderFigures(html.join(embedHtml));
+    const pieces = await Promise.all(
+      markdown.split(MARKER_SPLIT_RE).map((piece) => {
+        // A marker with nothing behind it drops out rather than printing itself.
+        if (piece === EMBED_MARKER) return embedHtml;
+        return marked(piece);
+      })
+    );
+    return renderSketches(renderFigures(pieces.join('')), slug);
   };
 
   // Frames are split out of the markdown rather than matched in the rendered
@@ -245,11 +386,18 @@ export async function getEntry<T = Frontmatter>(
         let inner = html;
         if (media && aside) {
           const pinned = applyFramePins(media, aside);
-          inner = `${pinned.media}<aside class="frame-aside">${pinned.aside}</aside>`;
+          // A narrow band has no gutter to set text in, so notes fall under the
+          // image the way the rail does on a small screen. Pins still pair up.
+          inner = segment.narrow
+            ? `${pinned.media}<div class="frame-notes">${pinned.aside}</div>`
+            : `${pinned.media}<aside class="frame-aside">${pinned.aside}</aside>`;
         }
-        // The nested article-grid keeps the mockup on the same tracks as the
-        // rest of the page while the band itself runs edge to edge.
-        return `<section class="frame full article-grid" style="--frame-bg:${frameBackground(segment.frame)}">${inner}</section>`;
+        // A full-bleed frame carries a nested article-grid, which keeps the
+        // mockup on the same tracks as the rest of the page while the band runs
+        // edge to edge. A narrow one is a plain block on the content track —
+        // without the grid there's no wide track for an image to escape into.
+        const shell = segment.narrow ? 'frame frame-narrow' : 'frame full article-grid';
+        return `<section class="${shell}" style="--frame-bg:${frameBackground(segment.frame)}">${inner}</section>`;
       })
     )
   ).join('');
@@ -262,12 +410,23 @@ export async function getEntry<T = Frontmatter>(
   };
 }
 
+/**
+ * Drafts are readable under `next dev` and dropped from the production export.
+ * Hiding them everywhere meant a draft couldn't be looked at at all — its page
+ * 404s locally too — and a collection whose entries were all drafts failed the
+ * build outright, since `output: export` needs a dynamic route to generate at
+ * least one page. In dev the list marks them; in the built site they don't
+ * exist. Read via a variable so the bundler can't fold this to a constant and
+ * tree-shake the branch away.
+ */
+const SHOW_DRAFTS = process.env['NODE_ENV'] === 'development';
+
 export async function getCollection<T extends { draft?: boolean } = Frontmatter>(
   collection: Collection
 ): Promise<Entry<T>[]> {
   const slugs = getSlugs(collection);
   const entries = await Promise.all(slugs.map((slug) => getEntry<T>(collection, slug)));
-  return entries.filter((entry) => !entry.data.draft);
+  return entries.filter((entry) => SHOW_DRAFTS || !entry.data.draft);
 }
 
 /** Sorts newest-first by year (and month, when given); ties break alphabetically by title. */

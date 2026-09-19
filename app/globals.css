@@ -1,11 +1,41 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  /* next/font sets --font-rethink on <html>. It has to be a different name from
+     the theme variable: @theme defines --font-sans on :root, which is the same
+     element, so `--font-sans: var(--font-sans), …` would be self-referential and
+     drop the whole declaration. */
+  --font-sans: var(--font-rethink), system-ui, sans-serif;
+
+  /* Not `--container-prose`: v4 has a built-in max-w-prose hardcoded to 65ch
+     that a theme variable can't override, and it fails silently — the measure
+     just changes. `max-w-measure` is our own utility, and "measure" is what the
+     comments in this file call it anyway. */
+  --container-measure: 620px;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 @layer base {
   html {
-    background: theme('colors.neutral.50');
-    color: theme('colors.neutral.900');
+    background: var(--color-neutral-50);
+    color: var(--color-neutral-900);
     font-size: 14px;
   }
 
@@ -16,7 +46,7 @@
 
   hr {
     border: none;
-    border-top: 1px solid theme('colors.neutral.200');
+    border-top: 1px solid var(--color-neutral-200);
   }
 }
 
@@ -47,7 +77,7 @@
    grid row can only align to whole blocks. The highlight is unscoped because the
    home page hand-writes a mark/annotation pair outside any .prose container. */
 mark {
-  background: theme('colors.yellow.100');
+  background: var(--color-yellow-100);
   color: inherit;
   padding: 0 0.12em;
   border-radius: 2px;
@@ -57,47 +87,56 @@ mark {
 .prose li,
 .prose blockquote { position: relative; }
 
-/* No `top`: the note keeps its static position — the line the highlight sits on —
-   while staying out of flow, so the paragraph doesn't grow to fit it. A float
-   would be trapped here, since grid items contain their floats. */
+/* The folded form is the base, since it's what a note gets whenever there's no
+   rail to hang it in — below 960px, or at any width once it's too long for one.
+   A float at full width, not a block: a block closes the line, so the sentence
+   stops dead right after the highlight and leaves the rest of that line empty. A
+   float is out of flow, so the text after the highlight finishes its line as if
+   the note weren't there; the note, too wide to share a line, drops below that
+   line, and the paragraph picks up again underneath it. Floats are contained by
+   the paragraph here (a grid item establishes a BFC), which out in the rail is
+   the problem — in the column it's exactly what we want, since a folded note
+   should take real space rather than overlap the lines below. */
 .annotation {
-  position: absolute;
-  right: calc(-10rem - 1.5rem);
-  width: 10rem;
-  padding-top: 0.5em;
-  border-top: 1px solid theme('colors.neutral.200');
+  float: left;
+  width: 100%;
+  margin: 0.9em 0;
+  padding: 0.75em 0 0.1em 1rem;
+  border-left: 2px solid var(--color-neutral-200);
   /* rem, not em: 14px flat, matching the body rather than scaling off whatever
      element the highlight happened to land in. */
   font-size: 1rem;
   line-height: 1.6;
-  color: theme('colors.neutral.500');
+  color: var(--color-neutral-500);
   text-align: left;
 }
+
+/* Wide enough for a rail, so the note goes out into it — unless lib/content.ts
+   marked it `.inline`, meaning its body is longer than the rail can hold beside
+   one paragraph. Notes are out of flow and so don't stack; a tall one in a
+   narrow rail runs past its own paragraph and lands on top of the next note or
+   a bleed image, which is the collision this class avoids.
+   No `top`: the note keeps its static position — the line the highlight sits on
+   — while staying out of flow, so the paragraph doesn't grow to fit it. The
+   float is dropped for the reason given above, run backwards: contained by the
+   grid item, it would open a gap in the body copy the size of the note. */
+@media (min-width: 961px) {
+  .annotation:not(.inline) {
+    position: absolute;
+    right: calc(-10rem - 1.5rem);
+    width: 10rem;
+    float: none;
+    margin: 0;
+    padding: 0.5em 0 0;
+    border-left: none;
+    border-top: 1px solid var(--color-neutral-200);
+  }
+}
+
 .annotation p { margin-bottom: 0.6em; line-height: 1.6; }
 .annotation p:last-child { margin-bottom: 0; }
 .annotation img { margin-bottom: 0.5em; }
-mark:hover + .annotation { color: theme('colors.neutral.900'); border-color: theme('colors.neutral.400'); }
-
-/* No rail left to put them in — fold notes back into the column. A float at full
-   width, not a block: a block closes the line, so the sentence stops dead right
-   after the highlight and leaves the rest of that line empty. A float is out of
-   flow, so the text after the highlight finishes its line as if the note weren't
-   there; the note, too wide to share a line, drops below that line, and the
-   paragraph picks up again underneath it.
-   Floats are contained by the paragraph here (a grid item establishes a BFC),
-   which out in the rail was the problem — in the column it's what we want, since
-   the note should take real space rather than overlap the lines below. */
-@media (max-width: 960px) {
-  .annotation {
-    position: static;
-    float: left;
-    width: 100%;
-    margin: 0.9em 0;
-    padding: 0.75em 0 0.1em 1rem;
-    border-top: none;
-    border-left: 2px solid theme('colors.neutral.200');
-  }
-}
+mark:hover + .annotation { color: var(--color-neutral-900); border-color: var(--color-neutral-400); }
 
 /* A tinted band for mockups, written as `:::frame stone-100` … `:::`. It runs
    edge to edge so UI that deliberately overshoots the edge of a mock has
@@ -117,6 +156,52 @@ mark:hover + .annotation { color: theme('colors.neutral.900'); border-color: the
 .frame > :first-child { margin-top: 0; }
 .frame > :last-child { margin-bottom: 0; }
 
+/* Same trade as the <hr> rules above, and for the same reason: grid items don't
+   collapse margins, so the gap above a frame was its own 2.5rem plus whatever
+   the previous element contributed (1.4em from a paragraph), while below it was
+   2.5rem alone. Zeroing both neighbours puts the whole gap on the frame, equal
+   on each side and settable in one place. It reads worst on a narrow frame,
+   whose edge is visible and close to the text, but the asymmetry was there on
+   full-bleed bands too. */
+.article-grid :has(+ .frame) { margin-bottom: 0; }
+.frame + * { margin-top: 0; }
+
+/* `:::frame stone-100 narrow` — the same tinted surface, held to the width of
+   the text column. For an image that reads at body size rather than a mockup
+   that needs room to overshoot into. There's no nested .article-grid on this
+   one, which is what stops anything inside reaching the wide track: `.bleed`
+   and the lone-image rule both select on `.article-grid > *`, so with no grid
+   they simply don't match and the figure stays put.
+
+   Outset by its own horizontal padding, so it's the band's *content* box that
+   aligns to the measure rather than its border box — the image inside lines up
+   with the body copy above and below it, and the tint hangs past on both sides.
+   --gutter is what it hangs by, which is the one value guaranteed to be there:
+   the grid's outer tracks are `minmax(var(--gutter), 1fr)`, so the content
+   column is never closer than that to the viewport edge. At the narrowest
+   widths the band lands flush against the edge, which is the right answer
+   anyway. */
+.frame-narrow {
+  margin: 2.5rem calc(var(--gutter) * -1);
+  padding: 1.5rem var(--gutter);
+  /* Corners are only available to this variant — a full-bleed band has no edge
+     on screen to round. 0.75rem matches .project-preview img, the other place a
+     panel holds an image; the work list's rounded-3xl would put a radius the
+     size of the padding right next to the image's own square corner. */
+  border-radius: 0.75rem;
+}
+
+/* The narrow band has no gutter to set supporting text in, so notes go under
+   the image, as the rail does on a small screen. Same type as .frame-aside. */
+.frame-notes {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-neutral-500);
+  margin-top: 1.25rem;
+}
+.frame-notes > :last-child { margin-bottom: 0; }
+.frame-notes p { margin-bottom: 0.9em; line-height: 1.6; }
+
 /* Supporting text hangs in the gutter beside the mockup rather than under it,
    pinned to the image's own row and centred against it. It only appears once
    the gutter is genuinely wide enough to set text in — below that the mockup
@@ -134,7 +219,7 @@ mark:hover + .annotation { color: theme('colors.neutral.900'); border-color: the
      body copy nowhere on the site. */
   font-size: 1rem;
   line-height: 1.6;
-  color: theme('colors.neutral.500');
+  color: var(--color-neutral-500);
 }
 .frame-aside > :first-child { margin-top: 0; }
 .frame-aside > :last-child { margin-bottom: 0; }
@@ -161,8 +246,8 @@ mark:hover + .annotation { color: theme('colors.neutral.900'); border-color: the
   width: 1.6em;
   height: 1.6em;
   border-radius: 999px;
-  background: theme('colors.rose.600');
-  color: theme('colors.neutral.50');
+  background: var(--color-rose-600);
+  color: var(--color-neutral-50);
   font-size: 0.75rem;
   font-weight: 700;
   font-style: normal;
@@ -205,7 +290,7 @@ dialog.zoom {
   background: transparent;
   overflow: hidden;
 }
-dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; }
+dialog.zoom::backdrop { background: var(--color-neutral-900); opacity: 0.94; }
 .zoom-inner {
   display: flex;
   flex-direction: column;
@@ -216,6 +301,10 @@ dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; 
   height: 100%;
   padding: 3rem 1.5rem;
 }
+/* A sketch fills the window rather than sitting inside the image zoom's
+   margins — SketchModal has already measured the stage against the viewport,
+   so the padding here would only push it off centre. */
+.zoom-inner:has(.sketch-stage) { padding: 1rem; gap: 0.75rem; }
 .zoom-inner img {
   max-width: 100%;
   max-height: calc(100vh - 10rem);
@@ -229,7 +318,7 @@ dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; 
   font-size: 0.85rem;
   line-height: 1.6;
   text-align: center;
-  color: theme('colors.neutral.400');
+  color: var(--color-neutral-400);
 }
 .zoom-close {
   position: absolute;
@@ -238,19 +327,117 @@ dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; 
   padding: 0.25rem 0.5rem;
   font-size: 1.5rem;
   line-height: 1;
-  color: theme('colors.neutral.400');
+  color: var(--color-neutral-400);
   cursor: pointer;
 }
-.zoom-close:hover { color: theme('colors.neutral.50'); }
+.zoom-close:hover { color: var(--color-neutral-50); }
 
 .embed-frame {
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border: 1px solid theme('colors.neutral.200');
-  background: theme('colors.neutral.900');
+  border: 1px solid var(--color-neutral-200);
+  background: var(--color-neutral-900);
   margin: 2.5rem 0;
 }
 .embed-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+/* A grid of sketch thumbnails, each a button that opens the sketch in a modal.
+   On the content track, not the wide one: these are thumbnails, and a row of
+   them reads as part of the paragraph it sits between rather than as a figure
+   breaking out of the column. Tracks are fractions of that width rather than a
+   fixed pixel size, so the tiles keep the measure's edges; auto-fit still wraps
+   them to two on a phone with no breakpoint. */
+.sketch-grid {
+  /* The one knob for tile shape — the sketches themselves are square, so any
+     landscape ratio crops them top and bottom. */
+  --ratio: 4 / 3;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  margin: 2.5rem 0;
+}
+/* .prose figure is width: fit-content, which would shrink the tile away from
+   its track instead of filling it. */
+.sketch-grid > .sketch { width: auto; max-width: none; margin: 0; }
+.sketch-thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: var(--ratio);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 0.75rem;
+  background: var(--color-neutral-50);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.sketch-thumb:hover,
+.sketch-thumb:focus-visible { border-color: var(--color-neutral-400); background: var(--color-white); }
+/* Two classes deep to beat `.prose img { height: auto; margin-inline: auto }`,
+   which is later in this file and would otherwise letterbox the still inside
+   the tile. cover, not contain: the image fills the tile and is cropped to it
+   rather than stretched out of proportion. */
+.sketch-grid .sketch-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  margin: 0;
+}
+/* The tile with no still behind it yet — a plain affordance rather than a
+   broken image, so a sketch can be listed before it has been captured. */
+.sketch-run {
+  font-size: 0.85rem;
+  color: var(--color-neutral-500);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 999px;
+  padding: 0.35em 0.8em;
+}
+.sketch-thumb:hover .sketch-run { color: var(--color-neutral-900); border-color: var(--color-neutral-900); }
+
+/* The running sketch, inside the same dialog the image zoom uses. A fixed-size
+   canvas can't reflow, so the iframe is built at its natural size and the whole
+   thing is scaled; SketchModal measures the viewport and sets --fit. Without a
+   size the iframe just fills the stage. */
+.sketch-stage {
+  position: relative;
+  max-width: 100%;
+  background: var(--color-white);
+  overflow: hidden;
+}
+/* A responsive embed has no size to scale from, so it just takes the room. */
+.sketch-stage:not([style]) { width: calc(100vw - 2rem); height: calc(100vh - 8rem); }
+.sketch-stage iframe { display: block; width: 100%; height: 100%; border: 0; }
+.sketch-stage[style] iframe {
+  width: calc(var(--size) * 1px);
+  height: calc(var(--size) * 1px);
+  transform-origin: top left;
+  transform: scale(var(--fit));
+}
+
+/* Repeated from .prose figcaption because the grid also renders outside .prose,
+   when the body has no {{embeds}} and the page appends it. */
+.sketch figcaption {
+  font-size: 0.85em;
+  color: var(--color-neutral-500);
+  margin-top: 0.6em;
+  text-align: center;
+}
+
+/* The thumbnail's accessible name — the image is decorative and the caption
+   below is a link to somewhere else. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 
 .prose p { margin-bottom: 1.4em; line-height: 1.8; }
 .prose p:last-child { margin-bottom: 0; }
@@ -261,6 +448,19 @@ dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; 
    introduces without gluing the two together. */
 .prose h2 { font-size: 1rem; font-weight: 600; margin-top: 0.6rem; margin-bottom: 0.9rem; }
 .prose h3 { font-size: 0.95rem; font-weight: 600; margin-top: 0.1rem; margin-bottom: 0.75rem; }
+
+/* A section break should sit the same distance from what's above it as from
+   what's below. It didn't: grid items don't collapse margins, so the gap on each
+   side was the rule's own margin plus the neighbour's, and the neighbours are
+   never symmetric — a paragraph above gives 1.4em, an h2 below gives 0.6rem, so
+   the rule ended up nearly twice as far from the text it followed as from the
+   heading it introduced. Zeroing both neighbours puts the whole gap on the hr,
+   where it can be one number. These have the same specificity as the rules they
+   override, so they have to stay below them. 2.5rem matches .frame and
+   .embed-frame, the other elements that break the page into sections. */
+.prose hr { margin: 2.5rem 0; }
+.prose :has(+ hr) { margin-bottom: 0; }
+.prose hr + * { margin-top: 0; }
 .prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1.4em; }
 .prose ul { list-style: disc; }
 .prose ol { list-style: decimal; }
@@ -268,13 +468,13 @@ dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; 
 .prose em { font-style: italic; }
 .prose strong { font-weight: 600; }
 .prose a { text-decoration: underline; text-underline-offset: 2px; }
-.prose a:hover { color: theme('colors.neutral.900'); }
+.prose a:hover { color: var(--color-neutral-900); }
 /* :not() spares Instagram's embed, which arrives carrying its own card styling —
    the quote bar and grey text would sit on top of it. */
 .prose blockquote:not(.instagram-media) {
-  border-left: 2px solid theme('colors.neutral.200');
+  border-left: 2px solid var(--color-neutral-200);
   padding-left: 1rem;
-  color: theme('colors.neutral.500');
+  color: var(--color-neutral-500);
   margin: 0.1em 0 1.5em;
 }
 .prose blockquote.instagram-media { margin-inline: auto; }
@@ -290,33 +490,38 @@ dialog.zoom::backdrop { background: theme('colors.neutral.900'); opacity: 0.94; 
 @media (max-width: 640px) {
   .figure-row { flex-direction: column; align-items: center; gap: 1.5rem; }
 }
-.prose figcaption { font-size: 0.85em; color: theme('colors.neutral.500'); margin-top: 0.6em; text-align: center; }
+.prose figcaption { font-size: 0.85em; color: var(--color-neutral-500); margin-top: 0.6em; text-align: center; }
 .prose code {
-  font-family: theme('fontFamily.mono');
+  font-family: var(--font-mono);
   font-size: 0.875em;
-  background: theme('colors.white');
+  background: var(--color-white);
   padding: 0.15em 0.35em;
   border-radius: 3px;
 }
 
 /* Header metadata: tag pills and the AI-assistance note that sits above the body. */
+/* Only ever seen under `next dev` — drafts don't exist in the built site. It
+   has to be loud enough that a draft is never mistaken for a published entry
+   while reading the local list. */
+.tag-draft {
+  font-size: 0.7rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-neutral-500);
+  background: var(--color-yellow-100);
+  border-radius: 3px;
+  padding: 0.25em 0.45em;
+}
+
 .tag {
   font-size: 0.8rem;
   line-height: 1;
-  color: theme('colors.neutral.500');
-  background: theme('colors.white');
-  border: 1px solid theme('colors.neutral.200');
+  color: var(--color-neutral-500);
+  background: var(--color-white);
+  border: 1px solid var(--color-neutral-200);
   border-radius: 999px;
   padding: 0.35em 0.7em;
-}
-
-.ai-note {
-  font-size: 0.85rem;
-  line-height: 1.7;
-  color: theme('colors.yellow.700');
-  background: theme('colors.yellow.50');
-  border-radius: 3px;
-  padding: 0.9rem 1rem;
 }
 
 /* Work-list hover/focus preview. The panel sits outside the measure entirely,

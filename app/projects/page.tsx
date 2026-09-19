@@ -15,10 +15,11 @@ export default async function ProjectsPage() {
     description: project.data.description,
     image: project.data.image,
     date: formatYearMonth(project.data),
+    draft: project.data.draft,
   }));
 
   return (
-    <main className="max-w-prose mx-auto px-6 py-16">
+    <main className="max-w-measure mx-auto px-6 py-16">
       <SiteHeader />
 
       <ProjectList items={items} />

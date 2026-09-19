@@ -25,6 +25,8 @@ Because the note is out of flow, it never pushes the body copy around — the pa
 
 A ==bare highlight== with no note attached is also fine. And here is a second note, ==far enough down=={{Anchored to a phrase in a later paragraph, so it clears the one above it without needing to stack.}} that it clears the one above.
 
+Past about 280 characters a note stops using the rail at all and folds into the column at every width, ==the way this one does=={{This note is deliberately long. In the rail it would run to roughly twice the height of the paragraph it hangs off, and since notes are out of flow and don't stack, it would land on whatever came next — the following note, or a bleed image. So `lib/content.ts` measures the note at build time and marks anything over the threshold, which is what puts it here in the column instead of out on the right. Nothing in the markdown says so; the length decides.}} — no syntax marks it, the length alone decides. A note carrying an image stays in the rail whatever its length, since a margin thumbnail is the point of that form.
+
 ## Heading level two
 
 Spacing above and below headings should look untouched. Grid items don't collapse their margins, so the values in `globals.css` were rebalanced to compensate — if headings start drifting apart, that's the thing to look at.
@@ -74,6 +76,14 @@ Frames hold whatever markdown you put in them, so a row of images works the same
 :::frame yellow-50
 ![Placeholder](/assets/sandbox/placeholder-wide.svg)
 ![Placeholder](/assets/sandbox/placeholder-wide.svg)
+:::
+
+Adding `narrow` after the colour holds the band to the width of the text column instead, for an image that shouldn't bleed at all — a UI detail or a crop that reads at body size. Nothing inside a narrow frame can reach the wide track, and with no gutter to set text in, supporting notes fall under the image rather than beside it.
+
+:::frame stone-100 narrow
+![Placeholder](/assets/sandbox/placeholder-wide.svg "A narrow frame, held to the measure.")
+
+A note under a narrow frame, since there's no rail to put it in.
 :::
 
 Every image on the page opens in a modal when clicked, including the thumbnail in the annotation rail above — there's nothing to add in the markdown for it.

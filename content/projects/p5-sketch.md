@@ -1,11 +1,17 @@
 ---
-title: "Random p5 sketch"
+title: "Rare candy"
 year: 2023
-description: A generative sketch built with p5.js. Runs differently each time.
+description: Dented pixels
 tags: [generative, p5js, interactive]
-embed: /p5/index.html
 featured: false
-draft: true
+image: /assets/p5-sketch/shy-primitive.png
+draft: false
 ---
 
-A p5.js sketch that generates something different on each visit. Consider it a small living thing.
+AAARGH
+
+{{sketch abvLra5Ou 400 shame on you scrolling diamond}}
+
+{{sketch mfZ5G1o4N shy primitive}}
+
+{{sketch jsfrirJgU masochist tree}}

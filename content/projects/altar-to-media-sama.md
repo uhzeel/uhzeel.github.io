@@ -1,5 +1,5 @@
 ---
-title: "an-altar to media-sama"
+title: "an altar to media-sama"
 year: 2018
 month: 12
 description: My first installation – a screen as an altar, suggesting people to offer themselves up.

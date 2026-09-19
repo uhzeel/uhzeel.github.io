@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <>
       <P5BackgroundLoader />
-      <main className="relative z-10 max-w-prose mx-auto px-6 py-16">
+      <main className="relative z-10 max-w-measure mx-auto px-6 py-16">
 
       <SiteHeader />
 

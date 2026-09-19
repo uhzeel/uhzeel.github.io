@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 const NAV = [
   { href: '/', label: 'About' },
   { href: '/projects', label: 'Work' },
-  { href: '/blog', label: 'Writing' },
+  { href: '/writing', label: 'Writing' },
 ];
 
 export default function SiteHeader() {

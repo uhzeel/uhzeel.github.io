@@ -9,6 +9,8 @@ export interface ProjectListItem {
   description: string;
   date: string;
   image?: string;
+  /** true only under `next dev` — drafts aren't in the built site at all */
+  draft?: boolean;
 }
 
 /**
@@ -91,7 +93,7 @@ export default function ProjectList({ items }: { items: ProjectListItem[] }) {
             <Link
               href={`/projects/${project.slug}`}
               onFocus={() => activate(index)}
-              className={`flex justify-between items-start gap-8 -mx-4 p-4 rounded-3xl border text-neutral-900 no-underline outline-none transition-colors ${
+              className={`flex justify-between items-start gap-8 -mx-4 p-4 rounded-3xl border text-neutral-900 no-underline outline-hidden transition-colors ${
                 active === index ? 'border-neutral-200 bg-white' : 'border-transparent'
               }`}
             >
@@ -104,7 +106,10 @@ export default function ProjectList({ items }: { items: ProjectListItem[] }) {
                   />
                 )}
                 <div>
-                  <p className="mb-1 text-neutral-900 font-medium">{project.title}</p>
+                  <p className="mb-1 text-neutral-900 font-medium">
+                    {project.title}
+                    {project.draft && <span className="tag-draft ml-2 align-middle">draft</span>}
+                  </p>
                   <p className="text-sm text-neutral-500">{project.description}</p>
                 </div>
               </div>
