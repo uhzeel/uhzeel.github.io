@@ -87,9 +87,9 @@ export default function WritingList({ items }: { items: WritingListItem[] }) {
                 {post.title}
                 {post.draft && <span className="tag-draft ml-2 align-middle">draft</span>}
               </p>
-              {post.description && <p className="text-sm text-neutral-500">{post.description}</p>}
+              {post.description && <p className="text-base text-neutral-500">{post.description}</p>}
             </div>
-            <span className="text-sm text-neutral-400 shrink-0 pt-0.5">{post.date}</span>
+            <span className="text-base text-neutral-400 shrink-0 pt-0.5">{post.date}</span>
           </Link>
         </li>
       ))}

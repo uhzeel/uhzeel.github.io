@@ -20,6 +20,15 @@ export interface ProjectFrontmatter {
   /** path under /public, e.g. "/assets/take-me-lightly/wli.png" — shown as a thumbnail in the list and on the project page */
   image?: string;
   featured?: boolean;
+  /**
+   * Which section of the Work page this sits under. Omitted means `personal`,
+   * which is the bulk of them — only an entry that belongs somewhere else needs
+   * to say so. A value outside this union fails the build in
+   * `app/projects/page.tsx` rather than silently falling into the default: with
+   * three sections a typo is easy and the page would look fine while quietly
+   * filing something under the wrong heading.
+   */
+  category?: 'work' | 'personal' | 'experiment';
   /** set true to hide from the list and exclude from the build entirely */
   draft?: boolean;
 }
@@ -149,16 +158,20 @@ interface Segment {
   markdown: string;
 }
 
+const FRAME_MODIFIERS = ['narrow'] as const;
+
 function splitFrames(markdown: string): Segment[] {
   const segments: Segment[] = [];
   let cursor = 0;
   for (const match of markdown.matchAll(FRAME_RE)) {
     segments.push({ markdown: markdown.slice(cursor, match.index) });
     const [colour, ...modifiers] = match[1].split(/[ \t]+/);
-    const unknown = modifiers.find((m) => m !== 'narrow');
+    const unknown = modifiers.find(
+      (m) => !(FRAME_MODIFIERS as readonly string[]).includes(m)
+    );
     if (unknown) {
       throw new Error(
-        `Unknown :::frame modifier "${unknown}" \u2014 the only one is "narrow".`
+        `Unknown :::frame modifier "${unknown}" \u2014 the only one is "${FRAME_MODIFIERS.join('", "')}".`
       );
     }
     segments.push({
@@ -202,31 +215,59 @@ function splitFrameAside(html: string): { media: string; aside: string } {
 const POINT_RE = /\{\{point\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\}\}\s*/g;
 
 /**
- * Numbers each `{{point}}` in document order, drops a matching pin on the
- * mockup and leaves the number in front of the note. Percentages rather than
- * pixels, so a pin holds its spot as the image scales between the wide track
- * and a phone — and unlike a drawn arrow, the pairing survives the rail folding
- * underneath the image below 1200px.
+ * Numbers each `{{point}}` in document order, marks the spot on the mockup and
+ * leaves the number in front of the note. Percentages rather than pixels, so a
+ * point holds its spot as the image scales between the wide track and a phone.
  *
- * The pins wrap the image rather than the figure because a figure's height
+ * The badge doesn't sit on the mockup — a dot marks the spot, a dashed line
+ * runs from it to whichever edge is nearer, and the number stands off the image
+ * altogether. A badge sitting on the spot covers the very thing it points at,
+ * which on a dense UI screenshot is most of what there is to see. Which side a
+ * point leads to is decided here rather than in CSS because only the x value
+ * knows, and it's a build-time constant.
+ *
+ * The marks wrap the image rather than the figure because a figure's height
  * includes its caption, which would throw every vertical percentage off.
  */
-function applyFramePins(media: string, aside: string): { media: string; aside: string } {
+function applyFramePins(
+  media: string,
+  aside: string
+): { media: string; aside: string; count: number } {
   const points: Array<{ x: string; y: string }> = [];
   const numbered = aside.replace(POINT_RE, (_, x: string, y: string) => {
     points.push({ x, y });
     return `<span class="pin">${points.length}</span>`;
   });
-  if (points.length === 0) return { media, aside };
+  if (points.length === 0) return { media, aside, count: 0 };
 
-  const pins = points
+  const leads = points
     .map(
       ({ x, y }, i) =>
-        `<span class="pin pin-on-image" style="left:${x}%;top:${y}%">${i + 1}</span>`
+        `<span class="pin-lead pin-lead-${Number(x) < 50 ? 'left' : 'right'}" style="--pin-x:${x}%;--pin-y:${y}%"><span class="pin">${i + 1}</span></span>`
     )
     .join('');
-  // Only the first image in a frame takes pins — the mockup being annotated.
-  return { media: media.replace(/<img\b[^>]*>/, (img) => `<span class="pin-target">${img}${pins}</span>`), aside: numbered };
+  // Only the first image in a frame takes points — the mockup being annotated.
+  return {
+    media: media.replace(
+      /<img\b[^>]*>/,
+      (img) => `<span class="pin-target">${img}${leads}</span>`
+    ),
+    aside: numbered,
+    count: points.length,
+  };
+}
+
+/**
+ * The dev-only half of the orphan check above: wraps a `{{point}}` that never
+ * found a mockup so it reads as a mistake rather than as prose, and says why
+ * on hover. The build refuses the same markup outright.
+ */
+function flagOrphanPoints(html: string): string {
+  return html.replace(
+    /\{\{point\s+[^}]*\}\}/g,
+    (marker) =>
+      `<span class="point-orphan" title="No mockup to pin to — a {{point}} has to sit in a :::frame, in a note with a blank line between it and the image.">${marker}</span>`
+  );
 }
 
 function frameBackground(token: string): string {
@@ -384,28 +425,60 @@ export async function getEntry<T = Frontmatter>(
         const { media, aside } = splitFrameAside(html);
         // With no image to sit beside, prose has no rail to go in and stays put.
         let inner = html;
+        let pinCount = 0;
         if (media && aside) {
           const pinned = applyFramePins(media, aside);
+          pinCount = pinned.count;
           // A narrow band has no gutter to set text in, so notes fall under the
-          // image the way the rail does on a small screen. Pins still pair up.
-          inner = segment.narrow
-            ? `${pinned.media}<div class="frame-notes">${pinned.aside}</div>`
-            : `${pinned.media}<aside class="frame-aside">${pinned.aside}</aside>`;
+          // image the way the rail does on a small screen. Points put their
+          // notes there too, at every width: a numbered note reads as an item
+          // in a list against the marks, and a list belongs under the thing it
+          // enumerates rather than half of it out in the rail.
+          inner =
+            segment.narrow || pinCount
+              ? `${pinned.media}<div class="frame-notes">${pinned.aside}</div>`
+              : `${pinned.media}<aside class="frame-aside">${pinned.aside}</aside>`;
         }
         // A full-bleed frame carries a nested article-grid, which keeps the
         // mockup on the same tracks as the rest of the page while the band runs
         // edge to edge. A narrow one is a plain block on the content track —
         // without the grid there's no wide track for an image to escape into.
-        const shell = segment.narrow ? 'frame frame-narrow' : 'frame full article-grid';
+        // frame-pinned is what pays for the leader rails: only a mockup that
+        // has points gives up width to them.
+        const shell = [
+          'frame',
+          segment.narrow ? 'frame-narrow' : 'full article-grid',
+          pinCount ? 'frame-pinned' : '',
+        ]
+          .filter(Boolean)
+          .join(' ');
         return `<section class="${shell}" style="--frame-bg:${frameBackground(segment.frame)}">${inner}</section>`;
       })
     )
   ).join('');
 
+  // A {{point}} that reached the output is one that never found an image to pin
+  // itself to, and it would print as literal braces on the page. The usual cause
+  // is no blank line between the image and the note: they end up in one <p>,
+  // which stops the image becoming a figure and leaves nothing to pin.
+  //
+  // Same split as drafts, and for the same reason: a half-written note is a
+  // normal state under `next dev`, and taking the whole page down mid-keystroke
+  // is worse than the literal braces it's warning about. So it marks the marker
+  // in dev — .point-orphan, which says what's wrong in place — and only fails
+  // the build, where an unrendered marker would ship.
+  const orphan = contentHtml.includes('{{point');
+  if (orphan && !SHOW_DRAFTS) {
+    throw new Error(
+      `${slug}: a {{point}} found no mockup to pin itself to. It has to sit in a ` +
+        `:::frame, in a note separated from the image by a blank line.`
+    );
+  }
+
   return {
     slug,
     data: frontmatter,
-    contentHtml,
+    contentHtml: orphan ? flagOrphanPoints(contentHtml) : contentHtml,
     embedInline,
   };
 }

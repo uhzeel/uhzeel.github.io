@@ -39,7 +39,7 @@ export default function Home() {
       </div>
 
       <div className="space-y-2 mb-12">
-        <p className="text-neutral-500 text-sm">
+        <p className="text-neutral-500 text-base">
           ↳ Live demo of Sortment:{' '}
           <a href="https://demo.sortment.com" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-neutral-900">
             demo.sortment.com
@@ -48,7 +48,7 @@ export default function Home() {
         </p>
       </div>
 
-      <p className="text-sm text-neutral-400">
+      <p className="text-base text-neutral-400">
         <a href="https://www.linkedin.com/in/uhzeel/" target="_blank" rel="noopener" className="hover:text-neutral-900">linkedin</a>
         {' · '}
         <a href="mailto:jazeel.ameen@gmail.com" className="hover:text-neutral-900">email</a>

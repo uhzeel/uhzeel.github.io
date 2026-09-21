@@ -24,21 +24,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   return (
     <main className="py-16">
       <div className="max-w-measure mx-auto px-6">
-        <BackLink href="/projects" label="Work" />
+        <BackLink href="/projects" label="uhweb/work" />
       </div>
 
       <article>
-        <header className="max-w-measure mx-auto px-6 mb-8">
+        {/* Title and description only. The date and tags are metadata about the
+            piece rather than part of it, and in the header they made the reader
+            get past four things before the first sentence — they now sit in the
+            footer, which is also where someone goes looking once they've read
+            it. */}
+        <header className="max-w-measure mx-auto px-6 mb-8 border-b border-neutral-200 pb-8">
           <h1 className="text-lg font-medium mb-2">{data.title}</h1>
-          <p className="text-neutral-600 leading-relaxed mb-3">{data.description}</p>
-          <p className="text-sm text-neutral-500">{formatYearMonth(data)}</p>
-          {data.tags && data.tags.length > 0 && (
-            <ul className="flex flex-wrap gap-2 mt-3">
-              {data.tags.map((tag) => (
-                <li key={tag} className="tag">{tag}</li>
-              ))}
-            </ul>
-          )}
+          <p className="text-neutral-600 leading-relaxed">{data.description}</p>
         </header>
 
         {contentHtml && (
@@ -59,6 +56,19 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
         )}
+
+        {/* Tags are set as plain prose, not pills: a pill reads as something you
+            can press, and these don't go anywhere — there's no tag index to
+            land on. */}
+        <footer className="max-w-measure mx-auto px-6 mt-14 border-t border-neutral-200 pt-6 text-base">
+          <p className="text-neutral-500">{formatYearMonth(data)}</p>
+          {data.tags && data.tags.length > 0 && (
+            <div className="mt-5">
+              <h2 className="text-neutral-400 mb-1">Filed under</h2>
+              <p className="text-neutral-600">{data.tags.join(', ')}</p>
+            </div>
+          )}
+        </footer>
       </article>
     </main>
   );

@@ -36,6 +36,9 @@
   html {
     background: var(--color-neutral-50);
     color: var(--color-neutral-900);
+    /* The site's floor. Nothing that is meant to be *read* is set below 1rem
+       anywhere — the two exceptions, .pin and .tag-draft, are marks rather
+       than text and say so at their own rules. */
     font-size: 14px;
   }
 
@@ -226,19 +229,46 @@ mark:hover + .annotation { color: var(--color-neutral-900); border-color: var(--
 .frame-aside p { margin-bottom: 0.9em; line-height: 1.6; }
 .frame-aside h2, .frame-aside h3 { font-size: 1em; margin-bottom: 0.4em; }
 
-/* Numbered callouts. A pin on the mockup and the same number in front of the
-   note that explains it — no line between them, which is what lets the pairing
-   survive the rail folding under the image on a narrow screen.
+/* Numbered callouts. A dot on the mockup, a dashed line out to the nearer edge,
+   the badge standing clear of the image, and the same number in front of the
+   note that explains it, down in .frame-notes.
 
-   Pink because a pin has to win against arbitrary UI underneath it, and nothing
+   The badge is off the image rather than on it because a badge sitting on the
+   spot covers the very thing it points at, and on a dense UI screenshot that's
+   most of what there is to see. No line is drawn between the badge and its note
+   — the number does that pairing, which is why the notes can sit anywhere.
+
+   Pink because a mark has to win against arbitrary UI underneath it, and nothing
    in the site's neutral-and-yellow palette does — greyscale chrome swallows a
-   neutral pin, and yellow is too close to the mark highlight to read as a
-   different kind of mark. The dark ring does the separating the fill can't.
-
-   Everything that makes a pin a pin lives on .pin, in rem rather than em, so
-   the one on the mockup and the one in front of the note are the same object at
-   the same size — .pin-on-image only says where it sits. */
+   neutral dot, and yellow is too close to the mark highlight to read as a
+   different kind of mark. This is the one place the site steps outside the
+   palette. */
 .pin-target { position: relative; display: block; }
+
+/* How far past the image the dashed run reaches, and so how much clear band
+   each side of the mockup needs. The floor is what a badge plus the shortest
+   readable dash takes; the vw term lets it breathe on a wide screen. */
+.frame-pinned { --pin-rail: clamp(2.25rem, 8vw, 3.5rem); }
+
+/* The rail is paid for by the image, not by the page. Anything that took the
+   room from outside the band — widening the band, or leaning on the grid's
+   outer track — runs out of road at some width and has to fold the leaders
+   away; taking it from the mockup works at every width down to a phone, so the
+   marks never change form. The mockup gets the width back on the wide track
+   below, which is why only a frame that actually has points pays anything. */
+.frame-pinned .pin-target { margin-inline: var(--pin-rail); }
+
+/* Widening the bleed track by exactly what the inset costs leaves a full-bleed
+   mockup at the same ~1020px it has without points. The track is
+   minmax(0, --wide) against a 1fr gutter, so when the viewport can't afford the
+   extra it collapses on its own rather than overflowing. A narrow frame has no
+   track to widen — its image gives up the rail for real, which is the price of
+   a band that stays on the measure. */
+.frame-pinned.full { --wide: calc(16rem + var(--pin-rail)); }
+
+/* Everything that makes a badge a badge lives here, in rem rather than em, so
+   the one beside the mockup and the one in front of the note are the same
+   object at the same size. */
 .pin {
   display: inline-flex;
   align-items: center;
@@ -248,23 +278,76 @@ mark:hover + .annotation { color: var(--color-neutral-900); border-color: var(--
   border-radius: 999px;
   background: var(--color-rose-600);
   color: var(--color-neutral-50);
+  /* Under the site's 1rem floor, and one of only two things that are. A badge
+     is a numeral in a disc, not text, and .pin sizes the disc off it — at 1rem
+     it comes out 22px, which no longer fits inside --pin-rail's 36px floor
+     next to a readable dash, so the rail would have to grow and every pinned
+     mockup would lose width for it. */
   font-size: 0.75rem;
   font-weight: 700;
   font-style: normal;
   line-height: 1;
   vertical-align: middle;
 }
-.pin-on-image {
+.frame-notes .pin { margin-right: 0.55em; }
+
+/* One flex row per point, stretched between the dot and the badge: anchored to
+   --pin-x at one end and to the far side of the rail at the other, so the
+   dashed run is whatever is left over and needs no length of its own. order:
+   puts the badge outermost and the dot on the spot; row-reverse mirrors the
+   whole thing for a point on the right half. The half-dot negative margin is
+   what centres the dot on --pin-x rather than hanging it off that edge. */
+.pin-lead {
   position: absolute;
-  transform: translate(-50%, -50%);
-  /* Decorative — clicks belong to the image underneath, which opens the modal. */
+  top: var(--pin-y);
+  display: flex;
+  align-items: center;
+  transform: translateY(-50%);
+  /* Decorative — a click belongs to the image underneath, which opens the zoom
+     modal, and that shows the bare image without any of this. */
   pointer-events: none;
 }
-/* Clears the ring, which sits outside the box and would otherwise touch the text. */
-.frame-aside .pin { margin-right: 0.55em; }
+.pin-lead .pin { order: 0; margin: 0 0.4rem; }
+.pin-lead::before {
+  content: "";
+  order: 1;
+  flex: 1 1 auto;
+  min-width: 0.4rem;
+  border-top: 1px dashed var(--color-rose-600);
+}
+.pin-lead::after {
+  content: "";
+  order: 2;
+  flex: none;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--color-rose-600);
+}
+.pin-lead-left {
+  left: calc(var(--pin-rail) * -1);
+  right: calc(100% - var(--pin-x));
+  margin-right: -0.225rem;
+}
+.pin-lead-right {
+  left: var(--pin-x);
+  right: calc(var(--pin-rail) * -1);
+  flex-direction: row-reverse;
+  margin-left: -0.225rem;
+}
 
-/* A 1020px mockup plus two rails wide enough to set text in needs roughly this
-   much viewport; under that the mockup keeps the whole band. */
+/* Dev only — lib/content.ts fails the build on one of these rather than
+   shipping it. Marked in the same pink as the point it failed to become, so it
+   reads as a broken mark and not as prose. */
+.point-orphan {
+  background: var(--color-rose-100);
+  color: var(--color-rose-700);
+  border-bottom: 1px dashed var(--color-rose-600);
+  font-family: ui-monospace, monospace;
+  font-size: 1em;
+  cursor: help;
+}
+
 @media (max-width: 1400px) {
   .frame-aside {
     grid-column: content;
@@ -315,7 +398,7 @@ dialog.zoom::backdrop { background: var(--color-neutral-900); opacity: 0.94; }
 }
 .zoom-caption {
   max-width: 620px;
-  font-size: 0.85rem;
+  font-size: 1rem;
   line-height: 1.6;
   text-align: center;
   color: var(--color-neutral-400);
@@ -388,7 +471,7 @@ dialog.zoom::backdrop { background: var(--color-neutral-900); opacity: 0.94; }
 /* The tile with no still behind it yet — a plain affordance rather than a
    broken image, so a sketch can be listed before it has been captured. */
 .sketch-run {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--color-neutral-500);
   border: 1px solid var(--color-neutral-300);
   border-radius: 999px;
@@ -417,9 +500,10 @@ dialog.zoom::backdrop { background: var(--color-neutral-900); opacity: 0.94; }
 }
 
 /* Repeated from .prose figcaption because the grid also renders outside .prose,
-   when the body has no {{embeds}} and the page appends it. */
+   when the body has no {{embeds}} and the page appends it — which is also why
+   this one is rem: 0.85em of the root would land under the 14px floor. */
 .sketch figcaption {
-  font-size: 0.85em;
+  font-size: 1rem;
   color: var(--color-neutral-500);
   margin-top: 0.6em;
   text-align: center;
@@ -490,10 +574,16 @@ dialog.zoom::backdrop { background: var(--color-neutral-900); opacity: 0.94; }
 @media (max-width: 640px) {
   .figure-row { flex-direction: column; align-items: center; gap: 1.5rem; }
 }
-.prose figcaption { font-size: 0.85em; color: var(--color-neutral-500); margin-top: 0.6em; text-align: center; }
+/* 1rem, not the 0.85em it was: prose is the root size, so any em fraction
+   lands under the 14px floor. A caption at body size is a little louder than
+   a caption wants to be — the grey is what sets it apart now, not the size. */
+.prose figcaption { font-size: 1rem; color: var(--color-neutral-500); margin-top: 0.6em; text-align: center; }
 .prose code {
   font-family: var(--font-mono);
-  font-size: 0.875em;
+  /* Would normally be optically corrected down to ~0.875em, but that's 12.25px
+     here and under the floor. Mono runs wide at a matched size, so inline code
+     sits slightly large on purpose. */
+  font-size: 1em;
   background: var(--color-white);
   padding: 0.15em 0.35em;
   border-radius: 3px;
@@ -502,7 +592,10 @@ dialog.zoom::backdrop { background: var(--color-neutral-900); opacity: 0.94; }
 /* Header metadata: tag pills and the AI-assistance note that sits above the body. */
 /* Only ever seen under `next dev` — drafts don't exist in the built site. It
    has to be loud enough that a draft is never mistaken for a published entry
-   while reading the local list. */
+   while reading the local list.
+   The other thing under the 1rem floor, and the cheapest exception to make:
+   it's an uppercase, letterspaced micro-label rather than running text, and
+   it never reaches the built site at all. */
 .tag-draft {
   font-size: 0.7rem;
   line-height: 1;
@@ -515,7 +608,7 @@ dialog.zoom::backdrop { background: var(--color-neutral-900); opacity: 0.94; }
 }
 
 .tag {
-  font-size: 0.8rem;
+  font-size: 1rem;
   line-height: 1;
   color: var(--color-neutral-500);
   background: var(--color-white);
@@ -552,6 +645,12 @@ dialog.zoom::backdrop { background: var(--color-neutral-900); opacity: 0.94; }
     width: 100%;
     height: auto;
     border-radius: 0.75rem;
+    /* Several thumbnails are transparent PNGs — a logo, a UI shot with rounded
+       corners knocked out. On white they lose their edges entirely, so they sit
+       on a tint instead, inset far enough off the edge that a logo has room to
+       breathe. Matches .project-thumb's bg-taupe-100 and p-2. */
+    background: var(--color-taupe-100);
+    padding: 0.5rem;
     opacity: 0;
     transition: opacity 200ms ease;
   }

@@ -1,8 +1,8 @@
 ---
 title: "Rare candy"
-year: 2023
-description: Dented pixels
-tags: [generative, p5js, interactive]
+year: 2021
+description: p5 sketch dump · Dented pixels
+tags: [Generative, p5js]
 featured: false
 image: /assets/p5-sketch/shy-primitive.png
 draft: false

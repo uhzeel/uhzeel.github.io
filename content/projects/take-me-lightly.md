@@ -2,7 +2,7 @@
 title: "take me lightly"
 year: 2021
 month: 1
-description: Giving last words to discarded 3D primitives, while unsure I deserved to be making anything.
+description: Virtual installation · Private last words from discarded 3D primitives
 tags: [installation, art, sound]
 embed: /takemelightly0/index.html
 image: /assets/take-me-lightly/wli.png

@@ -29,7 +29,7 @@ export default function SiteHeader() {
           <Link href="/" className="font-medium text-neutral-900 no-underline hover:text-neutral-600 block">
             Jazeel Ameen
           </Link>
-          <p className="text-md text-neutral-600">
+          <p className="text-base text-neutral-600">
             Product & Design ·{' '}
             <a
               href="https://sortment.com"
@@ -43,7 +43,7 @@ export default function SiteHeader() {
         </div>
       </div>
 
-      <nav className="flex text-md border-b border-neutral-200">
+      <nav className="flex text-base border-b border-neutral-200">
         {NAV.map((item) => {
           const active =
             item.href === '/' ? pathname === '/' : pathname?.startsWith(`${item.href}/`) || pathname === item.href;

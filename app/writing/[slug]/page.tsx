@@ -51,7 +51,7 @@ export default async function WritingPostPage({ params }: { params: Promise<{ sl
           {data.description && (
             <p className="text-neutral-600 leading-relaxed mb-3">{data.description}</p>
           )}
-          <p className="text-sm text-neutral-500">{formatYearMonth(data)}</p>
+          <p className="text-base text-neutral-500">{formatYearMonth(data)}</p>
           {data.tags && data.tags.length > 0 && (
             <ul className="flex flex-wrap gap-2 mt-3">
               {data.tags.map((tag) => (

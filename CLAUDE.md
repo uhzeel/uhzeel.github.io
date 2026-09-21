@@ -76,6 +76,7 @@ month: 3                    # optional, 1-12 — refines ordering/display within
 description: "One sentence shown in the project list"
 tags: [art, interactive]
 embed: /my-project/index.html   # optional — loads this URL in an iframe on the project page
+category: work              # optional — work | personal | experiment; omit for personal
 featured: true
 draft: true                 # optional — hides it from the list AND skips building its page entirely
 ---
@@ -135,9 +136,17 @@ Project pages render markdown into a CSS grid (`.article-grid` in `app/globals.c
   own control, and clicking it must open the sketch, not zoom the still.
 - **`{{embed}}`** places the frontmatter `embed` iframe at that exact point in the body instead of after everything. It's substituted everywhere it appears, so don't write it literally in body copy. Omit it and the embed is appended at the end as before.
 - **`:::frame <colour>` … `:::`** puts a tinted, edge-to-edge band behind whatever it contains — the home for UI mockups, where controls that deliberately overshoot the edge of the mock need a surface to overshoot onto. The colour is a Tailwind palette token (`stone-100`, `yellow-50`, `neutral-900`), resolved to a colour value on the `--frame-bg` custom property at build time in `lib/content.ts` (v4's palette is OKLCH, so it's an `oklch()` string rather than a hex), because Tailwind never scans markdown and a utility class wouldn't survive the build. An unknown token fails the build with the offending name. The band carries a nested `.article-grid`, so its contents sit on the page's normal tracks and every convention above still applies inside one — a lone image bleeds, two on consecutive lines become a row, captions work.
-- **`:::frame <colour> narrow`** holds the band to the width of the text column instead of running edge to edge — for an image that reads at body size rather than a mockup needing room to overshoot into. There's no nested `.article-grid` on a narrow frame, which is what stops anything inside reaching the wide track: `.bleed` and the lone-image rule both select on `.article-grid > *`, so with no grid they don't match. It's outset by its own horizontal padding — the band's content box aligns to the measure, not its border box — so the image inside lines up with the body copy while the tint hangs past it on both sides. Its corners are rounded (`0.75rem`, matching `.project-preview img`), which a full-bleed band can't be — it has no edge on screen. The outset is `--gutter`, the one width the grid guarantees is free. With no gutter to set text in, supporting text falls under the image in a `.frame-notes` block rather than into the rail; pins still pair up with their notes. `narrow` is the only modifier, and an unrecognised one fails the build by name.
+- **`:::frame <colour> narrow`** holds the band to the width of the text column instead of running edge to edge — for an image that reads at body size rather than a mockup needing room to overshoot into. There's no nested `.article-grid` on a narrow frame, which is what stops anything inside reaching the wide track: `.bleed` and the lone-image rule both select on `.article-grid > *`, so with no grid they don't match. It's outset by its own horizontal padding — the band's content box aligns to the measure, not its border box — so the image inside lines up with the body copy while the tint hangs past it on both sides. Its corners are rounded (`0.75rem`, matching `.project-preview img`), which a full-bleed band can't be — it has no edge on screen. The outset is `--gutter`, the one width the grid guarantees is free. With no gutter to set text in, supporting text falls under the image in a `.frame-notes` block rather than into the rail; points still pair up with their notes. `narrow` is the only modifier, and an unrecognised one fails the build by name.
 - **Anything in a frame that isn't an image becomes supporting text in the rail beside the mockup**, vertically centred against it, rather than stacking underneath. `lib/content.ts` gathers all of it into a single `<aside class="frame-aside">`, because only one grid item can be pinned to the image's row. It takes full markdown. This is why the band is full-bleed in the first place: the gutter next to a `wide` image is empty, so the text costs the mockup no width. Below 1400px there isn't enough gutter to set text in and the aside folds under the image — the same trade annotations make at 960px. A `figcaption` still renders directly under the image, so a short label and a longer note can coexist. A frame with no image in it leaves its prose where it was written.
-- **`{{point 62 18}}` at the head of a rail note** drops a numbered pin on the mockup — 62% across, 18% down — and puts the same number in front of the note. Percentages, not pixels, so a pin holds its spot as the image scales. Pins number themselves in the order they're written, so inserting one renumbers the rest. Only the frame's first image takes pins, and they wrap the `<img>` rather than the `<figure>` because a figure's height includes its caption, which would throw every vertical percentage off. There's deliberately no line drawn between pin and note: that's what keeps the pairing readable when the rail folds under the image below 1400px, where an arrow would have nothing sensible to point along. Pins are pink with a dark ring, and the pin on the mockup is the same object at the same size as the one in front of the note — pink because a pin has to win against arbitrary UI underneath it and nothing in the neutral-and-yellow palette does, the ring because the fill alone can't separate it from a light mockup. This is the one place the site steps outside neutrals and yellow. Pins are `pointer-events: none`, so a click still reaches the image and opens the zoom modal — which shows the bare image, without pins.
+- **`{{point 62 18}}` at the head of a frame note** marks a spot on the mockup — 62% across, 18% down — and puts the same number in front of the note. Percentages, not pixels, so a point holds its spot as the image scales. Points number themselves in the order they're written, so inserting one renumbers the rest. Only the frame's first image takes points, and they wrap the `<img>` rather than the `<figure>` because a figure's height includes its caption, which would throw every vertical percentage off.
+
+  **The badge doesn't sit on the mockup.** A dot marks the spot, a dashed line runs from it out to whichever edge is nearer, and the number stands clear of the image — a badge sitting on the spot covers the very thing it points at, which on a dense UI screenshot is most of what there is to see. Which side a point leads to is decided in `lib/content.ts` from the x value (`< 50` goes left) rather than in CSS, since only the x value knows and it's a build-time constant. Each leader is one flex row stretched between the dot and the badge, so the dashed run needs no length of its own; `order` puts the badge outermost and `row-reverse` mirrors it for a point on the right half. There's deliberately no line drawn between the badge and its note — the number does that pairing, which is what frees the notes to sit anywhere. Points are pink, the one place the site steps outside neutrals and yellow, because a mark has to win against arbitrary UI underneath it and nothing in the palette does. They're `pointer-events: none`, so a click still reaches the image and opens the zoom modal — which shows the bare image, unmarked.
+
+  **The rails are paid for by the image, not by the page**, and that's what makes them work at every width with no breakpoint and no folded fallback. `--pin-rail` (`clamp(2.25rem, 8vw, 3.5rem)`) is inset off the mockup on both sides; anything that took the room from outside the band instead — widening the band, or leaning on the grid's outer track — runs out of road somewhere around 720px and has to drop the badges back onto the image. A full-bleed frame wins the width back by raising `--wide` by exactly the inset (`.frame-pinned.full`), so its mockup stays at the same ~1020px it has without points; a narrow one has no track to widen, so its image really is a little narrower than the measure. Only a frame that has points pays anything — `lib/content.ts` adds `.frame-pinned` when it finds one.
+
+  **A frame with points puts its notes under the image**, in the `.frame-notes` block a narrow frame always uses, rather than out in the `.frame-aside` rail. A numbered note reads as an item in a list against the marks, and a list belongs under the thing it enumerates. A frame whose supporting text has no points keeps the rail as before.
+
+  **A note needs a blank line between it and the image** — on the next line down they share one paragraph, which stops the image becoming a figure and leaves nothing to mark. A `{{point}}` that reaches the rendered output takes the same split as drafts: under `next dev` it's marked in place as a `.point-orphan` with the reason on hover, since a half-written note is a normal state to be in and taking the page down mid-keystroke is worse than the braces it warns about; `npm run build` fails on it with the file's slug, where an unrendered marker would ship.
 - **Every image in the body opens in a modal on click**, with no markup needed. `app/components/ImageZoom.tsx` delegates from the document rather than binding per image, since the body is injected with `dangerouslySetInnerHTML` and there's no React tree to hang handlers off. It also adds the tab stop and button role at runtime, so an image doesn't advertise itself as a control on a page where the JS hasn't loaded. The caption, if the figure has one, is carried into the modal.
 - **`<figure class="full">`** (raw HTML in the markdown) goes edge-to-edge. `class="bleed"` on any element opts it into the wide track.
 - **`==highlighted phrase=={{note body}}`** puts an annotation in the side rail, anchored to that phrase. The note body accepts markdown. Below 960px there's no rail, so a note becomes a full-width float in the column: the sentence finishes its line past the highlight, the note drops below that line, and the paragraph resumes under it. A bare `==highlight==` with no `{{...}}` just marks the text.
@@ -151,9 +160,48 @@ Sizing lives in three custom properties on `.article-grid`: `--gutter`, `--measu
 
 Projects sort newest-first by `year` (and `month`, if set) — there's no manual `order` field anymore. Ties (same year, no month) break alphabetically by title. `year`/`month` display as "2024" or "Mar 2024" depending on whether `month` is set (see `formatYearMonth` in `lib/content.ts`).
 
-The Work page (`/projects`, the "Work" tab) is one flat, newest-first list. There used to be a `category: work | project` field splitting it into Work/Projects subsections; it was removed since every entry was a `project`. Reintroduce it if paid-employment entries ever need separating.
+The Work page (`/projects`, the "Work" tab) is split into three labelled sections,
+in this order, each newest-first within itself:
 
-A project page's header runs title → description → date → tags, with tags as pills (`.tag` in `globals.css`).
+| `category` | Heading | What goes there |
+|---|---|---|
+| `work` | ❖ Gets bread | Made inside a job — there was a product and a team on the other end |
+| `personal` (the default) | ✧ The bread | The self-directed body of work |
+| `experiment` | ◇ Half-baked | Testbeds and tinkering |
+
+Omitting `category` means `personal`, so only an entry that belongs elsewhere carries
+the line. A group with nothing in it isn't rendered at all, heading included. An
+unknown `category` value **fails the build**, naming the slug and the bad value —
+with three sections a typo is easy, and it would otherwise fall into the default and
+file something under the wrong heading while the page still looked fine. The list of
+sections is `SECTIONS` in `app/projects/page.tsx`; it's the single place the keys,
+the headings and the order are declared.
+
+Work leads because the page is read by people deciding whether to hire. The headings
+share a metaphor rather than splitting into Work/Personal, which quietly makes the
+second list sound like a hobby bin — the job work is no less the author's for having
+had a brief attached. The glyphs get lighter as the work gets less formal. Note the
+line isn't paid/unpaid: *take me lightly* was funded by Creative Scotland and still
+sits under ✧.
+
+The groups are sections inside one `ProjectList` rather than one component each.
+Everything that makes the list navigable is global: the arrow keys listen on the
+window, so two mounted lists would both answer an ArrowDown and fight over focus,
+and there's a single preview panel for the page. Rows carry an index that runs
+across the groups, which is also the tab order. The `<ul>`s are deliberately
+unpositioned so a row's `offsetTop` measures against the wrapper the panel is
+positioned in, and stays comparable from one group to the next.
+
+A project page's header is just title → description. The date and tags moved to a
+`<footer>` under the body and the embed, behind a `border-t` rule: they're metadata
+about the piece rather than part of it, and in the header the reader got past four
+things before reaching the first sentence. Tags are set as plain prose there —
+`"Filed under"` as a small label, then the tags joined with commas — because a pill
+reads as something you can press and there's no tag index to land on.
+
+The writing post page still carries the old header (date and tags as `.tag` pills),
+which is the one place `.tag` is used now. Writing is a deliberate copy, not a shared
+component, so bring it across by hand if the same change should apply there.
 
 ### Add a standalone interactive tool / experiment
 Drop the entire self-contained app (HTML + JS) into `public/my-tool/`. It becomes available at `uhzeel.github.io/my-tool/` with no framework overhead — completely isolated. Then add a project markdown file pointing to it with `embed: /my-tool/index.html`.
@@ -207,7 +255,21 @@ The extracted report images went 25 MB → 7 MB this way (four 6000×3368 photos
 
 ## Design
 
-- Font: **Rethink Sans** (Google Fonts, sans-serif)
+- Font: **Rethink Sans** (Google Fonts, sans-serif), one family for everything.
+  A serif for body copy was tried and reverted — it read badly against the rest
+  of the site. If it comes up again, the pairing to try is Alegreya + Alegreya
+  Sans rather than a serif dropped into the existing sans.
+- **1rem (14px) is the floor for anything meant to be read.** The site used to
+  run text down to 0.7rem (≈10px). Tag pills, zoom captions, sketch captions,
+  the "run sketch" affordance, list descriptions, dates and page footers are all
+  at 14px now, and `text-sm`/`text-xs` don't appear in any component. Because
+  prose sits at the root size, an `em` fraction inside `.prose` lands under the
+  floor, so `figcaption`, `code` and `.point-orphan` are all at `1em`/`1rem` —
+  inline code is optically a touch large as a result, which is the trade.
+  Two things sit below the floor on purpose, and each says why at its own rule:
+  `.pin` (0.75rem — a numeral in a disc, and the disc is sized off it, so
+  raising it forces `--pin-rail` wider and costs every pinned mockup width) and
+  `.tag-draft` (0.7rem — an uppercase micro-label that never ships).
 - Background: white `#fff`
 - Colour comes from the Tailwind palette only — there are no hex literals left in the codebase.
   Text is the `neutral` scale (`neutral-900` near-black, `neutral-700`/`600` body, `neutral-500`/`400`

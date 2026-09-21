@@ -2,8 +2,8 @@
 title: "“at your service”"
 year: 2019
 month: 5
-description: A machine that shows what it absorbed, the way a person on shift isn't allowed to.
-tags: [installation, art, interactive]
+description: Installation · A machine/service with its great responsibility (annoying yapper) 
+tags: [Installation, Critical Design]
 image: /assets/at-your-service/report/webcam-hanging.jpg
 featured: true
 ---

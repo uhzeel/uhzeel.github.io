@@ -2,9 +2,10 @@
 title: "Prose Sandbox [tester]"
 year: 2026
 month: 9
-description: A living reference for how pages here are put together — text measure, bleed widths, full-bleed images and side annotations.
+description: A living reference for how pages here are put together — text measure, bleed widths, full-bleed images and side annotations
 tags: [sandbox]
 featured: false
+draft: true
 ---
 
 Body copy sits in the content column, at the same measure the rest of the site uses. This paragraph is here to give the eye something to compare the wider elements against, and to check that **bold**, *italic*, `inline code` and [links](/projects/) all still behave the way they did before the grid went in.
@@ -59,16 +60,16 @@ A `:::frame` block sets a tinted band behind whatever it holds, which is what UI
 ![Placeholder](/assets/sandbox/placeholder-wide.svg "One mockup in a stone-100 band.")
 :::
 
-Anything in the frame that isn't an image becomes supporting text, and it hangs in the gutter beside the mockup rather than under it, top-aligned with the image. A short `figcaption` can still sit directly under the image at the same time — a label and a note about the thing labelled are different jobs.
+Anything in the frame that isn't an image becomes supporting text, and it hangs in the gutter beside the mockup rather than under it, top-aligned with the image. A short `figcaption` can still sit directly under the image at the same time — a label and a note about the thing labelled are different jobs. Numbered points are the exception: they read as a list against the marks, and a list belongs under the thing it enumerates rather than half of it out in the rail.
 
 :::frame stone-100
 ![Placeholder](/assets/sandbox/placeholder-wide.svg "A caption, still under the image.")
 
 Supporting text in the rail. It takes full markdown, so it can carry **emphasis**, a [link](/projects/) or a short list — room enough to explain what's happening in the mockup without pushing the mockup itself down the page.
 
-{{point 22 30}} A note that starts with a point marker drops a numbered pin on the mockup and keeps the same number in front of itself.
+{{point 22 30}} A note that starts with a point marker puts a dot on the mockup, runs a dashed line out to the nearer edge, and stands the badge clear of the image — a badge sitting on the spot covers the thing it points at.
 
-{{point 74 62}} Pins number themselves in the order they're written, so adding one in the middle renumbers the rest.
+{{point 74 62}} Points number themselves in the order they're written, so adding one in the middle renumbers the rest. A point past the middle leads right instead of left; nothing in the markdown says which, it's read off the x value at build time.
 :::
 
 Frames hold whatever markdown you put in them, so a row of images works the same way inside one as it does outside.
@@ -84,6 +85,8 @@ Adding `narrow` after the colour holds the band to the width of the text column 
 ![Placeholder](/assets/sandbox/placeholder-wide.svg "A narrow frame, held to the measure.")
 
 A note under a narrow frame, since there's no rail to put it in.
+
+{{point 30 40}} Points work here exactly as they do in a full-bleed frame: the rails come out of the image, so the marks never change form between the two. A narrow band can't widen its bleed track to win that room back, so this mockup really is a little narrower than the measure. Note that a point needs a blank line above it, or it lands in the same paragraph as the image and never becomes a note at all.
 :::
 
 Every image on the page opens in a modal when clicked, including the thumbnail in the annotation rail above — there's nothing to add in the markdown for it.
