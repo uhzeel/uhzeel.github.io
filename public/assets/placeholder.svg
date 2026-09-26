@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="450" viewBox="0 0 1600 450" role="img" aria-label="Image coming">
+  <rect width="1600" height="450" rx="18" fill="#f5f5f5"/>
+  <rect x="12" y="12" width="1576" height="426" rx="12" fill="none" stroke="#d4d4d4" stroke-width="3" stroke-dasharray="18 14"/>
+  <text x="800" y="241" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="40" fill="#a3a3a3">Image coming</text>
+</svg>
