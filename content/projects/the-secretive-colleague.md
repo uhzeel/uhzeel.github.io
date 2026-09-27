@@ -46,7 +46,7 @@ After some deliberation, we settled on 'Quests'. The analogy that came with it h
 
 It also carried the idea of [adventurers] creating a plan up front, scouting the terrain, and putting themselves out there. Plans fail and things get sidetracked, but there is always something to learn.
 
-I treated this metaphor to line how the design architecture plays out from here.
+I used this metaphor to line how the design architecture plays out from here.
 
 <!-- TODO: one line making the metaphor the design brief, so the later
      sections can call back to it for free. Distracted → the rabbitholes
@@ -71,9 +71,7 @@ We limit the experience to having the human user kick things off (input the ask)
 
 ## Launching a Quest
 
-We reduced scope to avoid building UI for untested waters, we kept things flexible by relying on toolcalls from the Assistant to create the Quest mechanisms. 
-
-Users would discuss a goal with the Assistant, and then approve the creation of a Quest – this is either explicitly asked, or floated as a suggestion by Assistant as it picks up signals worthy of a Quest.
+Users would discuss a goal with the Assistant, and then approve the creation of a Quest – this is either explicitly asked for by the human operator, or floated as a suggestion by the Assistant as it picks up signals worthy of a Quest.
 
 <!-- PLACEHOLDER SKELETON — copy this anywhere an image is still to come.
      Swap the src for the real file and drop "To come: " from the caption.
@@ -89,19 +87,19 @@ Users would discuss a goal with the Assistant, and then approve the creation of 
 
 ### Setting a higher bar on user requests
 
-Watching the first few Quests wander around too much or getting their heads stuck in very specific rabbitholes, meant there was too much drift and plots being lost –  plots that were never clear to begin with.
+We observed the first few Quests wandering around and too far, or getting their heads stuck in very specific rabbitholes – there was too much drift and plots were being lost; plots that were never clear to begin with.
 
-Quests were eager, finish-line-hungry machines that wanted to wrap things up fast and fire up whatever tools they had in their arsenals – with no hesitation when facing vague unsizeable scopes.
+At the same time, Quests were also eager, finish-line-hungry machines that wanted to wrap things up fast and fire up whatever tools they had in their arsenals – with no hesitation when facing vague scopes.
 
-> Generic product-side guardrails weren't going to be enough: my goal was to cater to personalised interests of users, which meant also holding them accountable for lazy querying — a behaviour we should consider when designing in this era.
+> Generic product-side guardrails weren't going to be enough to curb this behaviour: my goal was to cater to personalised interests of users, which meant holding them accountable for lazy querying — a behaviour to account for in designing for this new era of software, human operators, and LLMs.
 
 When requesting Quests, we tightened acceptance criteria by:
-- negotiating output expectations earlier instead of being surprised by how the Quest played out
-- drawing a scaffolding of a plan that is verified before having to wait to see the actual payload get rendered on the UI.
+- **Negotiating output expectations earlier**, so you're not surprised by how the Quest played out, and what it delivered
+- **Drawing a scaffolding of the plan** in advance during the negaotiation, do you don't need to wait to see the actual payload get rendered on the UI.
 
-Also get some work done in advance:
-- trying to some analysis directly in chat without offloading the same mundane task to a Milestone
-- conducting a preliminary study on existing analyses or entities that are already present in the workspace that feed this new Quests' directives, 
+Also get some context verification done in advance:
+- **Attempt preliminary analyses** in chat without offloading the same mundane task to a step in the Quest – some early discovery work
+- **Salvage and index as context** existing knowledge, insight, analyses or entities that are present in the workspace – especially when they might share this new Quests' directives.
 
 :::frame taupe-100
 ![Image coming](/assets/placeholder.svg "To come: transcript of the negotiation — a lazy request and what the Assistant asks back")
@@ -111,11 +109,15 @@ Also get some work done in advance:
 
 ## Revealing sequence
 
-Scrapping a ==vibe-coded kanban interface=={{This isn't some OpenClaw-like machine – the aesthetic was giving 'workaholic'.}}, I forced a linear list of tasks to anchor 'progress'.
+Scrapping a ==vibe-coded kanban interface=={{This isn't some OpenClaw-like machine, celebrating you deploying *N* number of troops (agents)  – the aesthetic was giving 'workaholic'.}}, I forced a linear list of tasks to anchor 'progress'.
 
-The kanban didn't demonstrate sequence, and how things can **course-correct** based on discoveries that happen in-flight. 
+The kanban view didn't demonstrate sequence, or the affordance of being able to **course-correct** based on discoveries that happen in-flight. 
 
-We unleashed this as an **experiment** – to observe how content would sit, how/if users would tweak the language, expectations on how it should structure itself, and also what configurations the LLM would settle on for these roadmaps.
+We unleashed this view as an **experiment** to observe: 
+- How content would sit, 
+- How/if users would tweak the language, 
+- How it would structure itself, and
+- What configurations the LLM would settle on for these roadmaps.
 
 :::frame taupe-100
 ![Quest Plan](/assets/sortment/plan-v1.png "The first version of the Quest Plan: broken into steps, and nested substeps - each with its own status and textual slop.")
@@ -126,71 +128,84 @@ We unleashed this as an **experiment** – to observe how content would sit, how
 
 The plan allowed a Quest to reveal what was next in mind, along with restrospectively cancelled plans. And more importantly, this gave operators a way to see its **current situation** in the form of a 'running' step.
 
-<!-- Retired heading: "### Observations". Its three bullets and the
-     nesting paragraph now open the sections they each motivate.
-     TODO: consider cropping plan-v1.png into three detail shots so each
-     failure section can open with its own evidence instead of asking the
-     reader to scroll back up to this one. -->
 
 ---
 
-<!-- SECTION: intake. First in the lifecycle, last thing you actually fixed.
-     TODO: rename — drop "Problem 2", it is no longer second. State the
-     failure: the bar for accepting a request was on the floor.
-     TODO: one line buying back the chronology you are giving up here —
-     that this was the last thing fixed and should have been the first. -->
 
-<!-- SECTION [HEADING — MINE]: rename to the failure. Something like
-     "Everything sounded the same". -->
+## Lanterns in the brain fog
 
-## Reading the plan
-
-The depth of nesting seemed to feed only our desires to see faux intelligence being flaunted around; we need to **snap out of the collective trance** that is this LLM-master-race-omg-my-computer-can-talk-nerdy-to-me.
+Sub-steps sounding awefully similar to each other and their parent steps + summaries repeating or expanding on the title, adding much more friction to how you scan the list of steps on the left; reading it meant inviting yourself to the Quests' brain fog.
 
 :::frame taupe-100
 ![Image coming](/assets/placeholder.svg "To come: Zoom in on brain fog.")
 :::
 
-Sub-steps sounding awefully similar to each other and their parent steps + summaries repeating or expanding on the title, adding much more friction to how you scan the list of steps on the left; reading it meant inviting yourself to the Quests' brain fog.
+The depth of nesting seemed to feed only our desires to see faux intelligence being flaunted around; we need to **snap out of the collective trance** that is this LLM-master-race-omg-my-computer-can-talk-nerdy-to-me.
 
-Internally, we **renamed the parent steps to Milestones**, and force the LLM to output only one level of nested 'steps'. This was done to increase the gravity on these parent steps, dress it up as the 'reporting centre' for the sub-goal that the Quest has identified for it.
+Internally, we **renamed the parent steps to Milestones**, and forced the LLM to output only one level of nested 'steps'. This was done to increase the gravity on these parent steps, dress it up as the 'reporting centre' for the sub-goal that the Quest has identified for it.
 
-**Milestones are questions.** A milestone names the open question the phase resolves — interrogative, because the phase exists to answer it. First-person-plural — "What apps do we target, and how?" not "Phase 2: Re-Engagement Hypothesis." No "Phase N" prefixes, no numbering.
+We quickly decided to **reduce nesting depth**. Milestone → step, and nothing deeper than that. Steps would start collapsed behind a "Show steps" toggle. 
 
-**Executions are imperatives, and are usually sub-steps.** A sub-step names the action being taken — verb-led. "Define target channels," "Draft value-prop per app," "Create the prioritized opportunity set." Question at the milestone, verb at the step: this grammatical contrast reinforces the gravity that milestones have without relying just on indentation.
 
-**Nesting collapsed.** Milestone → step, and nothing below that. The old 2.1.1-under-2.1-under-Phase-2 depth is gone, and the steps that remain sit behind a "Show steps" toggle rather than arriving pre-indented. The plan now reads as milestone, and can be expected to present synthesized reports at each.
+:::frame taupe-100
+![Image coming](/assets/placeholder.svg "To come: Nesting nests.")
+:::
+
+
+**Milestones become questions**, first-person-plural interrogatives.
+- "What apps do we target, and how?" not "Phase 2: Re-Engagement Hypothesis." 
+- No "Phase N" prefixes, no numbering.
+
+**Substeps become imperatives**, verb-led execution statements. 
+- "Define target channels"
+- "Draft value-prop per app"
+- "Create the prioritized opportunity set". 
+
+Question at the milestone, verb at the step: **this grammatical contrast reinforces the gravity that milestones have without relying just on indentation.**
 
 ---
 
-<!-- SECTION [HEADING — MINE]: rename to the failure. Something like
-     "It kept telling you what it set out to do". -->
-
 ## Watching it run
 
-- Showing the step's objective in the primary real-estate long after its completion; coming back to a step meant pushing through the recap everytime + varying height allocations had you searching for what mattered.
-- Technical approach to executions + very 'FYI, guys calc is short for calculator, in case you're new to the stream' energy + Quest ops overexplained to an operator who just wants some grounding first - too much transparency?
+More revealing **live-state verb forms** were introduced. In-progress steps read as present-progressive actions — Eg: "Creating prioritized opportunity set…", while hinting these at the top as "∞ Crunching" or "Waiting for input" (more on this in a bit).
 
-:::frame taupe-100 narrow
+:::frame white-100 narrow
 ![Quest Statuses](/assets/sortment/quest-status.png "Statuses that reveal more.")
 :::
 
-**Live-state verb forms.** In-progress steps read as present-progressive actions — "Creating prioritized opportunity set…", "Crunching…", "Waiting for input"
+The step's objective was shown in the primary real-estate long after its completion, so coming back to a step meant pushing through the recap everytime. Visually, the varying heights this blob of text occupied had you **searching for what mattered**.
+
+Over use, it became evident that the thing people were searching for was the outcome of the selected step. So we had the pane **demote the Objective, and lead with the outcome.**
+
+:::frame taupe-100
+![Image coming](/assets/placeholder.svg "To come: Compare sequence of step pane.")
+:::
+
+We also injected explicit **formatting rules**. Outcome summaries went from flat paragraphs to a lead line with:
+- key phrases bolded,
+- bullets carrying specifics fanned out, 
+- and so-whats
+
+Like splashing cold water on a confidence machine, we fed in suppression rules based on what we'd noticed the model loved to flaunt:
+- technical approaches to executions
+- repetitive reminders about what other steps accomplished
+- overexplained Quest ops – redundant when the structure and sequence is already being presented by the UI
+
+This made things much easier to scan, blame, scrutinize, and share.
 
 :::frame taupe-100 narrow
 ![A completed milestone](/assets/sortment/step-completed.png "A completed milestone, with its objective and captured inputs.")
 :::
 
-**Findings restructured to bold-lead + bullets.** Outcome summaries went from flat paragraphs to a lead line with key phrases bolded (not the whole sentence) and findings carrying their "so-what."
 
-**Objective demoted, outcome promoted.** The step's objective used to lead. Now, the live finding leads ("125K revoked merchants in play…"), and Objective sits at the bottom along with Your responses.
+
+
+The plan now read as milestones with synthesized reports, throughout its lifecycle.
+
 
 ---
 
-<!-- SECTION [HEADING — MINE]: rename to the failure. Something like
-     "It never asked". -->
-
-## Stepping in
+## Ah yes, let's not forget the 'human in the loop'
 
 <!-- TODO: this section has the two best screenshots and no stated failure
      to open on. The v1 ran to completion without ever stopping — say that,
